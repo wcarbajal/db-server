@@ -36,6 +36,7 @@ class Server {
   middlewares() {
     //CORS
     this.app.use( cors() );
+    console.log("se ejecuta el cors")
 
     //Lectura y parseo del body
     this.app.use( express.json() );
