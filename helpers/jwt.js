@@ -1,0 +1,26 @@
+const jwt = require( 'jsonwebtoken' );
+
+
+const generarjwt = ( id ) => {
+
+
+  return new Promise( ( resolve, reject ) => {
+
+    const payload = { id };
+    //TODO: cambiar la palabra secreta
+    jwt.sign( payload, process.env.SECRETORPRIVATEKEY, {
+      expiresIn: '24h'
+    }, ( err, token ) => {
+      if ( err ) {
+        console.log( err );
+        reject( 'No se pudo generar el JWT' );
+      } else {
+        resolve( token );
+      }
+    } );
+  } );
+};
+
+module.exports = {
+  generarjwt
+};
