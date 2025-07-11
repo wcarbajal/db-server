@@ -51,11 +51,7 @@ const login = async ( req, res = response ) => {
 
 };
 
-const usuariosPut = ( req, res ) => {
-  res.json( {
-    msg: "put Api - Controlador"
-  } );
-};
+
 
 const crearUsuario = async ( req = request, res ) => {
 
@@ -109,21 +105,35 @@ const crearUsuario = async ( req = request, res ) => {
 };
 //fin post
 
-const usuariosDelete = ( req, res ) => {
+const renovarToken = async ( req, res ) => {
+  
+  const id = req.id;
+  // generar un nuevo token
+  const token = await  generarjwt( id );
+
+  // obtener el usuario por id
+  const usuarioDB = await prisma.usuario.findUnique( {
+    where: {
+      id
+    }
+    
+  } )
+
+  const { password, ...usuario } = usuarioDB;
   res.json( {
-    msg: "delete Api - Controlador"
-  } );
-};
-const usuariosPatch = ( req, res ) => {
-  res.json( {
-    msg: "patch Ap - Controlador"
+    ok: true,
+    msg: "renovar Api - Controlador",
+    token,
+    usuario
   } );
 };
 
+
+
+
 module.exports = {
   login,
-  crearUsuario,
-  usuariosPut,
-  usuariosDelete,
-  usuariosPatch,
+  crearUsuario,  
+  renovarToken,
+  
 };

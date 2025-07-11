@@ -1,8 +1,10 @@
 const { Router } = require( 'express' );
-const {  usuariosPut,  usuariosDelete, usuariosPatch, crearUsuario, login } = require( '../controllers/auth.controllers' );
-const { body, check } = require( 'express-validator' );
-const { validarCampos } = require( '../controllers/middlewares/validar-campos' );
+const {  crearUsuario, login, renovarToken } = require( '../controllers/auth.controllers' );
+const {  check } = require( 'express-validator' );
+
 const { PrismaClient } = require( '@prisma/client' );
+const { validarCampos } = require( '../middlewares/validar-campos' );
+const { validarJWT } = require( '../middlewares/validar-jwt' );
 
 
 const router = Router();
@@ -15,7 +17,7 @@ router.post( '/',[
   validarCampos
 ] , login );
 
-router.put( '/', usuariosPut );
+
 
 router.post( '/nuevo', [
   check( 'nombre', 'El nombre es obligatorio' ).not().isEmpty(),
@@ -36,8 +38,7 @@ router.post( '/nuevo', [
   validarCampos
 ], crearUsuario );
 
-router.delete( '/', usuariosDelete );
+router.get( '/renovar', validarJWT, renovarToken );
 
-router.patch( '/', usuariosPatch );
 
 module.exports = router;
