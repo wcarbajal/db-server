@@ -19,7 +19,7 @@ router.post( '/',[
 
 
 
-router.post( '/nuevo', [
+router.post( '/registrar', [
   check( 'nombre', 'El nombre es obligatorio' ).not().isEmpty(),
   check( 'password', 'El password es obligatorio' ).isLength( { min: 6, max: 15 } ),  
   check( 'correo', 'El correo no es valido' ).isEmail(),
@@ -32,7 +32,7 @@ router.post( '/nuevo', [
     })
 
     if (!exiteRol) {
-      throw new Error ('EL rol no esta registrado en la base de datos')
+      throw new Error ('EL rol no esta registrado en la base de datos Z')
     }
   }),
   validarCampos

@@ -64,12 +64,15 @@ const crearUsuario = async ( req = request, res ) => {
       correo
     }
   } );
+  
 
   if ( isUser.length > 0 ) {
-    return res.status( 409 ).json( {
-      msg: "post Api - Controlador- correo registrado",
+    return res.status( 400 ).json( {
+      ok: false,
+      msg: "el correo ya se encuentra registrado",
     } );
   }
+  
 
   const rolId = await prisma.roles.findFirst( {
     where: {
@@ -82,7 +85,7 @@ const crearUsuario = async ( req = request, res ) => {
   const contraseña = bcrytpjs.hashSync( password, salt );
 
 
-  const usuario = await prisma.usuario.create( {
+  const usuarioDB = await prisma.usuario.create( {
     data: {
       nombre,
       correo,
@@ -91,13 +94,14 @@ const crearUsuario = async ( req = request, res ) => {
       rolesId: rolId.id
     }
   } );
-  const { password: _password, ...restUsuario } = usuario;
+  const { password: _password, ...usuario } = usuarioDB;
 
-  const token = await generarjwt( usuario.id );
+  const token = await generarjwt( usuarioDB.id );
 
   res.status( 200 ).json( {
+    ok: true,
     msg: "post Api - Controlador",
-    restUsuario,
+    usuario,
     token
   } );
 
@@ -106,18 +110,18 @@ const crearUsuario = async ( req = request, res ) => {
 //fin post
 
 const renovarToken = async ( req, res ) => {
-  
+
   const id = req.id;
   // generar un nuevo token
-  const token = await  generarjwt( id );
+  const token = await generarjwt( id );
 
   // obtener el usuario por id
   const usuarioDB = await prisma.usuario.findUnique( {
     where: {
       id
     }
-    
-  } )
+
+  } );
 
   const { password, ...usuario } = usuarioDB;
   res.json( {
@@ -133,7 +137,7 @@ const renovarToken = async ( req, res ) => {
 
 module.exports = {
   login,
-  crearUsuario,  
+  crearUsuario,
   renovarToken,
-  
+
 };
