@@ -1,8 +1,9 @@
 require( 'dotenv' ).config();
 const express = require( 'express' );
 const cors = require( 'cors' );
+const socketio = require( 'socket.io' );
 
-
+const Sockets = require( './sockets' );
 
 
 class Server {
@@ -14,8 +15,10 @@ class Server {
     // Middelware
     this.middlewares(); //http://localhost:8080/api
 
+
     //Rutas de mi aplicación
     this.routes();
+    this.io = socketio( this.server, { /* configuraciones */ } );
 
   }
 
@@ -43,6 +46,25 @@ class Server {
 
     //Directorio público
     this.app.use( express.static( 'public' ) );
+  }
+
+  configurarSockets() {
+      new Sockets( this.io );
+   }
+
+  execute(){
+    // Inicializar Middlewares
+    //this.listen()
+    //this.middlewares();
+
+    //Rutas de mi aplicación
+    //this.routes();
+
+    // Inicializar sockets
+    //this.configurarSockets();
+
+    // Inicializar Server
+    this.configurarSockets()
   }
 }
 

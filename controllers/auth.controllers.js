@@ -6,7 +6,9 @@ const { generarjwt } = require( '../helpers/jwt' );
 
 const login = async ( req, res = response ) => {
 
-  const { correo, password } = req.body;
+  const { correo, password } = req.body; 
+  // Validar datos con Zod
+ 
 
   try {
 
@@ -64,7 +66,7 @@ const crearUsuario = async ( req = request, res ) => {
       correo
     }
   } );
-  
+
 
   if ( isUser.length > 0 ) {
     return res.status( 400 ).json( {
@@ -72,7 +74,7 @@ const crearUsuario = async ( req = request, res ) => {
       msg: "el correo ya se encuentra registrado",
     } );
   }
-  
+
 
   const rolId = await prisma.roles.findFirst( {
     where: {
