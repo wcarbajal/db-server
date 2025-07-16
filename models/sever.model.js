@@ -1,8 +1,10 @@
-require( 'dotenv' ).config();
+
+require('dotenv').config();
 const express = require( 'express' );
 const cors = require( 'cors' );
+const path = require( 'path' );
 const socketio = require( 'socket.io' );
-
+const http     = require('http');
 const Sockets = require( './sockets' );
 
 
@@ -12,13 +14,18 @@ class Server {
     this.port = process.env.PORT;
     this.loginPath = '/api/login';
 
-    // Middelware
-    this.middlewares(); //http://localhost:8080/api
+    // Http server
+    this.server = http.createServer( this.app );
+
+    // Configuraciones de sockets
+   this.io = socketio(this.server, {
+      cors: {
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST"]
+      }
+    });
 
 
-    //Rutas de mi aplicación
-    this.routes();
-    this.io = socketio( this.server, { /* configuraciones */ } );
 
   }
 
@@ -31,40 +38,43 @@ class Server {
 
   listen() {
 
-    this.app.listen( this.port, () => {
+    this.server.listen( this.port, () => {
       console.log( `Corriendo en puerto: ${ this.port }` );
     } );
   }
 
   middlewares() {
+    
+    // Desplegar el directorio público
+    this.app.use( express.static( path.resolve( __dirname, '../public' ) ) );
+
     //CORS
     this.app.use( cors() );
-    console.log("se ejecuta el cors")
+    
+    console.log( "se ejecuta el cors" );
 
     //Lectura y parseo del body
     this.app.use( express.json() );
 
-    //Directorio público
-    this.app.use( express.static( 'public' ) );
   }
 
   configurarSockets() {
-      new Sockets( this.io );
-   }
+    new Sockets( this.io );
+  }
 
-  execute(){
-    // Inicializar Middlewares
-    //this.listen()
-    //this.middlewares();
+  execute() {
+
+    // Middelware
+    this.middlewares(); //http://localhost:8080/api
+
+
+    // Configuración de sockets
+    this.configurarSockets();
 
     //Rutas de mi aplicación
-    //this.routes();
+    this.routes();
 
-    // Inicializar sockets
-    //this.configurarSockets();
-
-    // Inicializar Server
-    this.configurarSockets()
+    this.listen();
   }
 }
 

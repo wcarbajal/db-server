@@ -1,15 +1,28 @@
 
+
 class Sockets {
 
-  constructor( socketio ) {
-    this.io = socketio;
-    this.socketEvents();
-  }
+    constructor( io ) {
 
-  socketEvents() {
-    this.io.on( 'connection', ( socket ) => {
-      console.log( 'Cliente conectado', { socket } );
-    } );
-  }
+        this.io = io;
+
+        this.socketEvents();
+    }
+
+    socketEvents() {
+        // On connection
+        this.io.on('connection', ( socket ) => {
+
+          console.log("primer socket conectado");
+
+           
+            
+        
+        });
+    }
+
 
 }
+
+
+module.exports = Sockets;
