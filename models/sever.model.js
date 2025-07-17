@@ -5,7 +5,7 @@ const cors = require( 'cors' );
 const path = require( 'path' );
 const socketio = require( 'socket.io' );
 const http     = require('http');
-const Sockets = require( './sockets' );
+const Sockets = require( './sockets.model' );
 
 
 class Server {

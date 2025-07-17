@@ -32,5 +32,6 @@ model Usuario {
   img      String?
   estado   Boolean? @default(true)
   google   Boolean? @default(false)
+  online   Boolean? @default(false)
   rolesId  Int
 }
