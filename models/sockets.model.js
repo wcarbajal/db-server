@@ -1,3 +1,6 @@
+const { use } = require( 'react' );
+const { usuarioConectado } = require( '../controllers/socket.controllers' );
+const { comprobarJWT } = require( '../helpers/jwt' );
 
 
 class Sockets {
@@ -15,14 +18,16 @@ class Sockets {
 
       const [ valido, id ] = comprobarJWT( socket.handshake.query[ 'x-token' ] );
 
-      console.log( valido, id );
+      console.log( {valido}, {id} );
       
       if ( !valido ) {
         console.log( 'socket no identificado' );
         return socket.disconnect();
       }
 
-      await usuarioConectado( id );
+     const userConect = await usuarioConectado( id );
+
+     console.log(userConect);
 
 
     } );

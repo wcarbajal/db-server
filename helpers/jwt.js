@@ -25,7 +25,7 @@ const generarjwt = ( id ) => {
 const comprobarJWT = (token = '' ) => {
   try {
 
-    const { id } = jwt.verify( token, process.env.JWT_SECRET)
+    const { id } = jwt.verify( token, process.env.SECRETORPRIVATEKEY)
     return [true, id ]
     
   } catch (error) {

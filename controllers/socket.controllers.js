@@ -32,6 +32,8 @@ return usuario;
     data: { online: false }
   })
   const { password: _password, ...usuario } = usuarioDB;
+  
+  console.log("usuario desconectado", usuario);
 
 return usuario;
 
