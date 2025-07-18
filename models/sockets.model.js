@@ -1,4 +1,4 @@
-const { use } = require( 'react' );
+
 const { usuarioConectado } = require( '../controllers/socket.controllers' );
 const { comprobarJWT } = require( '../helpers/jwt' );
 

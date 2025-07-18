@@ -57,7 +57,7 @@ const login = async ( req, res = response ) => {
 
 const crearUsuario = async ( req = request, res ) => {
 
-  const { nombre, correo, password, img, rol } = req.body;
+  const { nombre, correo, password, img, rol ="USER" } = req.body;
 
   // verificar si el correo existe
 
