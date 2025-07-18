@@ -35,3 +35,15 @@ model Usuario {
   online   Boolean? @default(false)
   rolesId  Int
 }
+
+
+model Proceso {
+  id           Int       @id @default(autoincrement())
+  nombre       String
+  descripcion  String?
+  parentId     Int?
+  parent       Proceso?  @relation("ProcesoPadre", fields: [parentId], references: [id])
+  hijos        Proceso[] @relation("ProcesoPadre")
+  creadoEn     DateTime  @default(now())
+  actualizadoEn DateTime @updatedAt
+}
