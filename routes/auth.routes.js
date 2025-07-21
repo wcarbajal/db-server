@@ -1,22 +1,22 @@
 const { Router } = require( 'express' );
-const {  crearUsuario, login, renovarToken } = require( '../controllers/auth.controllers' );
-const {  check } = require( 'express-validator' );
+const { crearUsuario, login, renovarToken } = require( '../controllers/auth.controllers' );
+const { check } = require( 'express-validator' );
 
 const { PrismaClient } = require( '@prisma/client' );
 const { validarCampos } = require( '../middlewares/validar-campos' );
-const { validarJWT } = require( '../middlewares/validar-jwt' );
-const { minSize } = require( 'zod' );
+const { validarJWT } = require( '../middlewares/jwt' );
+
 
 
 const router = Router();
-const  prisma  = new PrismaClient();
+const prisma = new PrismaClient();
 
 
-router.post( '/',[
+router.post( '/', [
   check( 'correo', 'El correo es obligatorio' ).isEmail(),
   check( 'password', 'El password es obligatorio' ).not().isEmpty(),
   validarCampos
-] , login );
+], login );
 
 
 
@@ -27,17 +27,17 @@ router.post( '/registrar', [
   check( 'password', 'El password debe tener entre 6 y 15 caracteres' ).isLength( { min: 6, max: 15 } ),
   check( 'correo', 'El correo no es valido' ).isEmail(),
   /* check( 'rol', 'No es un rol permitido' ).isIn(['ADMIN_ROLE', 'USER_ROLE']), */
-  check('rol').custom( async ( rol = '')  => {
-    const existeRol = await prisma.roles.findFirst({
+  check( 'rol' ).custom( async ( rol = '' ) => {
+    const existeRol = await prisma.roles.findFirst( {
       where: {
         rol
       }
-    })
+    } );
 
-    if (!existeRol) {
-      throw new Error ('EL rol no esta registrado en la base de datos Z')
+    if ( !existeRol ) {
+      throw new Error( 'EL rol no esta registrado en la base de datos Z' );
     }
-  }),
+  } ),
   validarCampos
 ], crearUsuario );
 

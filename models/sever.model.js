@@ -1,11 +1,13 @@
 
-require('dotenv').config();
+require( 'dotenv' ).config();
 const express = require( 'express' );
 const cors = require( 'cors' );
 const path = require( 'path' );
 const socketio = require( 'socket.io' );
-const http     = require('http');
+const http = require( 'http' );
 const Sockets = require( './sockets.model' );
+const { validarJWT } = require( '../middlewares/jwt' );
+
 
 
 class Server {
@@ -13,17 +15,18 @@ class Server {
     this.app = express();
     this.port = process.env.PORT;
     this.loginPath = '/api/login';
+    this.procesosPath = '/api/procesos';
 
     // Http server
     this.server = http.createServer( this.app );
 
     // Configuraciones de sockets
-   this.io = socketio(this.server, {
+    this.io = socketio( this.server, {
       cors: {
         origin: "http://localhost:5173",
-        methods: ["GET", "POST"]
+        methods: [ "GET", "POST" ]
       }
-    });
+    } );
 
 
 
@@ -32,6 +35,7 @@ class Server {
   routes() {
 
     this.app.use( this.loginPath, require( '../routes/auth.routes' ) );
+    this.app.use( this.procesosPath, validarJWT, require( '../routes/procesos.routes' ) );
 
   }
 
@@ -44,13 +48,13 @@ class Server {
   }
 
   middlewares() {
-    
+
     // Desplegar el directorio público
     this.app.use( express.static( path.resolve( __dirname, '../public' ) ) );
 
     //CORS
     this.app.use( cors() );
-    
+
     console.log( "se ejecuta el cors" );
 
     //Lectura y parseo del body

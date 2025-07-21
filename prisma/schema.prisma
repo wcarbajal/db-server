@@ -39,6 +39,7 @@ model Usuario {
 
 model Proceso {
   id           Int       @id @default(autoincrement())
+  codigo       String    @unique
   nombre       String
   descripcion  String?
   parentId     Int?
