@@ -24,27 +24,46 @@ model Roles {
 }
 
 model Usuario {
-  id       Int      @id @default(autoincrement())
-  nombre   String   @default("John Doe")
-  correo   String   @unique
-  password String
-  rol      Roles    @relation(fields: [rolesId], references: [id])
-  img      String?
-  estado   Boolean? @default(true)
-  google   Boolean? @default(false)
-  online   Boolean? @default(false)
-  rolesId  Int
+  id                  Int       @id @default(autoincrement())
+  nombre              String    @default("John Doe")
+  correo              String    @unique
+  password            String
+  rol                 Roles     @relation(fields: [rolesId], references: [id])
+  img                 String?
+  estado              Boolean?  @default(true)
+  google              Boolean?  @default(false)
+  online              Boolean?  @default(false)
+  rolesId             Int
+  procesosResponsable Proceso[] @relation("ProcesoResponsables")
+}
+
+model Proceso {
+  id            Int       @id @default(autoincrement())
+  codigo        String    @unique
+  nombre        String
+  tipo          TipoProceso
+  nivel         Int
+  descripcion   String?
+  parentId      Int?
+  parent        Proceso?  @relation("ProcesoPadre", fields: [parentId], references: [id])
+  hijos         Proceso[] @relation("ProcesoPadre")
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+  dueños       Dueño[]
+  responsables  Usuario[] @relation("ProcesoResponsables")
+}
+
+model Dueño {
+  id        Int      @id @default(autoincrement())
+  oficina   String
+  director  String
+  procesoId Int?
+  proceso   Proceso? @relation(fields: [procesoId], references: [id])
 }
 
 
-model Proceso {
-  id           Int       @id @default(autoincrement())
-  codigo       String    @unique
-  nombre       String
-  descripcion  String?
-  parentId     Int?
-  parent       Proceso?  @relation("ProcesoPadre", fields: [parentId], references: [id])
-  hijos        Proceso[] @relation("ProcesoPadre")
-  creadoEn     DateTime  @default(now())
-  actualizadoEn DateTime @updatedAt
+enum TipoProceso {
+  Misional
+  Soporte
+  Estratégico
 }

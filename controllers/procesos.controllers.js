@@ -25,7 +25,7 @@ const listaProcesos = async ( req = request, res = response ) => {
 
 const registrarProceso = async ( req = request, res = response ) => {
 
-  const { codigo, nombre, descripcion, parentId } = req.body;
+  const { codigo, tipo, nivel, nombre, descripcion, parentId } = req.body;
 
   try {
     // Verificar si el código ya existe
@@ -44,6 +44,8 @@ const registrarProceso = async ( req = request, res = response ) => {
       data: {
         codigo,
         nombre,
+        tipo,
+        nivel: +nivel,
         descripcion, 
         parentId: parentId ? Number( parentId ) : null
       }
