@@ -6,9 +6,9 @@ const { generarjwt } = require( '../helpers/jwt' );
 
 const login = async ( req, res = response ) => {
 
-  const { correo, password } = req.body; 
+  const { correo, password } = req.body;
   // Validar datos con Zod
- 
+
 
   try {
 
@@ -57,7 +57,7 @@ const login = async ( req, res = response ) => {
 
 const crearUsuario = async ( req = request, res ) => {
 
-  const { nombre, correo, password, img, rol ="USER" } = req.body;
+  const { nombre, correo, password, img, rol = "USER" } = req.body;
 
   // verificar si el correo existe
 
@@ -124,6 +124,12 @@ const renovarToken = async ( req, res ) => {
     }
 
   } );
+  if ( !usuarioDB ) {
+    return res.status( 404 ).json( {
+      ok: false,
+      msg: 'Usuario no encontrado'
+    } );
+  }
 
   const { password, ...usuario } = usuarioDB;
   res.json( {
