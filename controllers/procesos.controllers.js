@@ -7,7 +7,11 @@ const prisma = new PrismaClient();
 const listaProcesos = async ( req = request, res = response ) => {
 
 
-  const procesos = await prisma.proceso.findMany();
+  const procesos = await prisma.proceso.findMany({
+    where: {
+      estado: true
+    }
+  });
 
 
   if ( !procesos || procesos.length === 0 ) {
@@ -66,7 +70,8 @@ const registrarProceso = async ( req = request, res = response ) => {
 
 const actualizarProceso = async ( req = request, res = response ) => {
   const { id } = req.params;
-  const { codigo, nombre, descripcion, parentId } = req.body;
+  const { codigo, tipo, nivel, nombre, descripcion, parentId } = req.body;
+  
 
   try {
     // Verificar si el proceso existe
@@ -80,13 +85,26 @@ const actualizarProceso = async ( req = request, res = response ) => {
         msg: 'Proceso no encontrado'
       } );
     }
+      let parentIdValue = procesoExistente.parentId;
+    if (typeof parentId !== "undefined" && parentId !== "") {
+      if (!/^\d+$/.test(parentId)) {
+        return res.status(400).json({
+          ok: false,
+          msg: 'El parentId debe ser un número entero si se proporciona'
+        });
+      }
+      parentIdValue = Number(parentId);
+    }
+
     const procesoActualizado = await prisma.proceso.update( {
       where: { id: Number( id ) },
       data: {
-        codigo,
-        nombre: nombre ? nombre : procesoExistente.nombre,
-        descripcion: descripcion ? descripcion : procesoExistente.descripcion,
-        parentId: parentId ? parentId : procesoExistente.parentId
+        codigo: codigo ?? procesoExistente.codigo,
+        nombre: nombre ?? procesoExistente.nombre,
+        descripcion: descripcion ?? procesoExistente.descripcion,
+        tipo: tipo ?? procesoExistente.tipo,
+        nivel: nivel ? +nivel : procesoExistente.nivel,
+        parentId: parentIdValue
       }
     } );
     res.json( {
@@ -107,8 +125,24 @@ const eliminarProceso = async ( req = request, res = response ) => {
   const { id } = req.params;
 
   try {
-   const procesoEliminado = await prisma.proceso.delete( {
+
+    // Verificar si el proceso existe
+    const procesoExistente = await prisma.proceso.findUnique( {
       where: { id: Number( id ) }
+    } );
+    if( !procesoExistente ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'Proceso no encontrado'
+      } );
+    }
+
+   const procesoEliminado = await prisma.proceso.update( {
+      where: { id: Number( id ) },
+      data: {
+         estado: false, 
+         codigo: procesoExistente.codigo + " (Eliminado)" + new Date().toISOString(),
+         }
     } );
     if ( !procesoEliminado ) {
       return res.status( 404 ).json( {
