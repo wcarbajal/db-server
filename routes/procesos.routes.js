@@ -3,7 +3,7 @@ const {  check } = require( 'express-validator' );
 
 
 
-const { listaProcesos, actualizarProceso, eliminarProceso, registrarProceso, detalleProceso } = require( '../controllers/procesos.controllers' );
+const { listaProcesos, actualizarProceso, eliminarProceso, registrarProceso, detalleProceso, listaProcesosNivel0 } = require( '../controllers/procesos.controllers' );
 const { validarCampos } = require( '../middlewares/validar-campos' );
 
 
@@ -13,6 +13,11 @@ router.get( '/', [
 
   validarCampos
 ], listaProcesos );
+
+router.get( '/nivel0', [
+
+  validarCampos
+], listaProcesosNivel0 );
 
 router.get( '/detalle/:id', [
 

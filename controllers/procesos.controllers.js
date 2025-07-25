@@ -27,6 +27,30 @@ const listaProcesos = async ( req = request, res = response ) => {
   } );
 };
 
+const listaProcesosNivel0 = async ( req = request, res = response ) => {
+
+
+  const procesos = await prisma.proceso.findMany({
+    where: {
+      estado: true, 
+      nivel: 0
+    }
+  });
+
+
+  if ( !procesos || procesos.length === 0 ) {
+    return res.status( 404 ).json( {
+      ok: false,
+      msg: 'No se encontraron procesos'
+    } );
+  }
+  res.json( {
+    ok: true,
+    msg: 'Lista de procesos',
+    procesos
+  } );
+};
+
 const registrarProceso = async ( req = request, res = response ) => {
 
   const { codigo, tipo, nivel, nombre, descripcion, parentId } = req.body;
@@ -210,5 +234,6 @@ module.exports = {
   registrarProceso,
   actualizarProceso,
   eliminarProceso, 
-  detalleProceso
+  detalleProceso,
+  listaProcesosNivel0
 };
