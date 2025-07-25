@@ -3,7 +3,7 @@ const {  check } = require( 'express-validator' );
 
 
 
-const { listaProcesos, actualizarProceso, eliminarProceso, registrarProceso } = require( '../controllers/procesos.controllers' );
+const { listaProcesos, actualizarProceso, eliminarProceso, registrarProceso, detalleProceso } = require( '../controllers/procesos.controllers' );
 const { validarCampos } = require( '../middlewares/validar-campos' );
 
 
@@ -13,6 +13,12 @@ router.get( '/', [
 
   validarCampos
 ], listaProcesos );
+
+router.get( '/detalle/:id', [
+
+  validarCampos
+], detalleProceso );
+
 
 router.post( '/registrar', [
   check( 'codigo', 'El código es obligatorio' ).not().isEmpty(),
@@ -41,5 +47,7 @@ router.delete( '/:id', [
   check( 'id', 'El ID debe ser un número entero' ).isInt(),
   validarCampos
 ], eliminarProceso );
+
+//
 
 module.exports = router;

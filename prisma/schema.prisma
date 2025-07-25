@@ -37,23 +37,6 @@ model Usuario {
   procesosResponsable Proceso[] @relation("ProcesoResponsables")
 }
 
-model Proceso {
-  id            Int         @id @default(autoincrement())
-  codigo        String      @unique
-  nombre        String
-  tipo          TipoProceso
-  nivel         Int
-  descripcion   String?
-  parentId      Int?
-  estado        Boolean?    @default(true)
-  parent        Proceso?    @relation("ProcesoPadre", fields: [parentId], references: [id])
-  hijos         Proceso[]   @relation("ProcesoPadre")
-  creadoEn      DateTime    @default(now())
-  actualizadoEn DateTime    @updatedAt
-  dueños       Dueño[]
-  responsables  Usuario[]   @relation("ProcesoResponsables")
-}
-
 model Dueño {
   id        Int      @id @default(autoincrement())
   oficina   String
@@ -66,4 +49,98 @@ enum TipoProceso {
   Misional
   Soporte
   Estratégico
+}
+
+model Proceso {
+  id               Int             @id @default(autoincrement())
+  codigo           String          @unique
+  nombre           String
+  tipo             TipoProceso
+  nivel            Int
+  descripcion      String?
+  parentId         Int?
+  estado           Boolean?        @default(true)
+  parent           Proceso?        @relation("ProcesoPadre", fields: [parentId], references: [id])
+  hijos            Proceso[]       @relation("ProcesoPadre")
+  creadoEn         DateTime        @default(now())
+  actualizadoEn    DateTime        @updatedAt
+  dueños          Dueño[]
+  responsables     Usuario[]       @relation("ProcesoResponsables")
+  detalleProceso   DetalleProceso? @relation(fields: [detalleProcesoId], references: [id])
+  detalleProcesoId Int?            @unique
+}
+
+model DetalleProceso {
+  id Int @id @default(autoincrement())
+
+  procedimiento    String?
+  indicadores      String?
+  proceso          Proceso?
+  diagramaRelacion Diagrama? @relation(fields: [diagramaId], references: [id])
+  diagramaId       Int?      @unique
+
+  fichaRelacion Ficha? @relation(fields: [fichaId], references: [id])
+  fichaId       Int?   @unique
+
+  procedimientoRelacion Procedimiento? @relation(fields: [procedimientoId], references: [id])
+  procedimientoId       Int?           @unique
+
+  indicadoresList indicador[]
+}
+
+model Diagrama {
+  id            Int      @id @default(autoincrement())
+  url           String
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  detalleProceso DetalleProceso?
+}
+
+model Ficha {
+  id                   Int     @id @default(autoincrement())
+  objetivo             String?
+  objetivoEstratégico String?
+  alcance              String?
+  entradas             String?
+  salidas              String?
+  proveedores          String?
+  clientes             String?
+  riesgos              String?
+  registros            String?
+
+  DetalleProceso DetalleProceso?
+}
+
+model Procedimiento {
+  id          Int         @id @default(autoincrement())
+  actividades Actividad[]
+
+  DetalleProceso DetalleProceso?
+}
+
+model Actividad {
+  id              Int            @id @default(autoincrement())
+  nombre          String
+  descripcion     String?
+  responsable     String
+  procedimiento   Procedimiento? @relation(fields: [procedimientoId], references: [id])
+  procedimientoId Int?
+}
+
+model indicador {
+  id              Int     @id @default(autoincrement())
+  nombre          String
+  tipo            String
+  justificacion   String?
+  formula         String?
+  sentidoEsperado String?
+  unidadMedida    String?
+  frecuencia      String?
+  fuenteDatos     String?
+  logrosEsperados String?
+
+  lineaBase        String?
+  detalleProceso   DetalleProceso? @relation(fields: [detalleProcesoId], references: [id])
+  detalleProcesoId Int?
 }

@@ -164,9 +164,51 @@ const eliminarProceso = async ( req = request, res = response ) => {
 };
 
 
+const detalleProceso = async ( req = request, res = response ) => {
+  const { id } = req.params;
+  try {
+    const proceso = await prisma.proceso.findUnique( {
+      where: { id: Number( id ) },
+      include: {
+        dueños: true,
+        hijos: true,
+        parent: true,
+        responsables: true,
+        detalleProceso: {
+          include: {
+            diagramaRelacion: true,
+            fichaRelacion: true,
+            procedimientoRelacion: true,
+            indicadoresList: true
+          }
+        },
+      }
+    } );
+
+    if ( !proceso ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'Proceso no encontrado'
+      } );
+    }
+
+    res.json( {
+      ok: true,
+      msg: 'Detalle del proceso',
+      proceso
+    } );
+  } catch ( error ) {
+    console.error( error );
+    res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al obtener el detalle del proceso'
+    } );
+  }
+}
 module.exports = {
   listaProcesos,
   registrarProceso,
   actualizarProceso,
-  eliminarProceso
+  eliminarProceso, 
+  detalleProceso
 };
