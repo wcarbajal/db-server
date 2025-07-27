@@ -51,6 +51,7 @@ class Server {
 
     // Desplegar el directorio público
     this.app.use( express.static( path.resolve( __dirname, '../public' ) ) );
+    this.app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
     //CORS
     this.app.use( cors() );

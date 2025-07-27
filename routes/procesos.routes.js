@@ -1,10 +1,11 @@
 const { Router } = require( 'express' );
 const {  check } = require( 'express-validator' );
+const fileUpload = require('express-fileupload');
 
 
 
-const { listaProcesos, actualizarProceso, eliminarProceso, registrarProceso, detalleProceso, listaProcesosNivel0 } = require( '../controllers/procesos.controllers' );
-const { validarCampos } = require( '../middlewares/validar-campos' );
+const { listaProcesos, actualizarProceso, eliminarProceso, registrarProceso, detalleProceso, listaProcesosNivel0, actualizarDiagrama } = require( '../controllers/procesos.controllers' );
+const { validarCampos, validarArchivo } = require( '../middlewares/validar-campos' );
 
 
 const router = Router();
@@ -19,11 +20,17 @@ router.get( '/nivel0', [
   validarCampos
 ], listaProcesosNivel0 );
 
+router.post( '/actualizar-diagrama/:id', [ 
+  fileUpload(),
+  validarCampos
+], actualizarDiagrama );
+
 router.get( '/detalle/:id', [
 
   validarCampos
 ], detalleProceso );
 
+/* fetchConToken(`procesos/actualizar-diagrama/${procesoId}`, formData, "POST"); */
 
 router.post( '/registrar', [
   check( 'codigo', 'El código es obligatorio' ).not().isEmpty(),

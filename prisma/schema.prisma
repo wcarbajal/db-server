@@ -40,7 +40,9 @@ model Usuario {
 model Dueño {
   id        Int      @id @default(autoincrement())
   oficina   String
+  siglas    String
   director  String
+  correo    String
   procesoId Int?
   proceso   Proceso? @relation(fields: [procesoId], references: [id])
 }
