@@ -1,20 +1,20 @@
 const { PrismaClient } = require( '@prisma/client' );
 const prisma = new PrismaClient();
-const bcryptjs = require( 'bcryptjs' );
+//const bcryptjs = require( 'bcryptjs' );
 
 
 async function main() {
   // Crear roles
-  await prisma.roles.createMany( {
+/*   await prisma.roles.createMany( {
     data: [
       { rol: 'ADMIN' },
       { rol: 'USER' }
     ],
     skipDuplicates: true
   } );
-
+ */
   // crear dueños
-  await prisma.dueño.createMany( {
+  await prisma.owner.createMany( {
     data: [
       { oficina: "Dirección Ejecutiva", siglas: "DE", director: "Alexandra Ames Brachowicz", correo: "alexandra.ames@pronabec.gob.pe" },
       { oficina: "Oficina de Asesoría Jurídica", siglas: "OAJ", director: "Cesar Paul Hernández Pérez", correo: "cesar.hernandez@pronabec.gob.pe" },
@@ -45,7 +45,7 @@ async function main() {
   } );
 
   // Crear procesos
-  await prisma.proceso.createMany( {
+ /*  await prisma.proceso.createMany( {
     data: [
       { codigo: "S1", nombre: "Gestión de recursos humanos", tipo: "Soporte", nivel: 0, descripcion: "Gestión de recursos humanos", parentId: null, estado: true },
       { codigo: "S1.1", nombre: "Organización del trabajo", tipo: "Soporte", nivel: 1, descripcion: "Organización del trabajo", parentId: 1, estado: true },
@@ -119,13 +119,13 @@ async function main() {
 
     ],
     skipDuplicates: true
-  } );
+  } ); */
 
   // Obtener el rol ADMIN
 
 
   // Crear usuario admin
-  const passwordHash = bcryptjs.hashSync( '123456', 10 );
+ /*  const passwordHash = bcryptjs.hashSync( '123456', 10 );
 
   await prisma.usuario.create( {
     data: {
@@ -137,8 +137,8 @@ async function main() {
       google: false,
       online: false
     }
-  } );
-}
+  } );*/
+} 
 
 main()
   .then( () => {

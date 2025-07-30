@@ -12,6 +12,13 @@ const listaProcesos = async ( req = request, res = response ) => {
   const procesos = await prisma.proceso.findMany( {
     where: {
       estado: true
+    },
+    include: {
+      detalleProceso: true,
+      parent: true,
+      hijos: true,
+      owners: true,
+      responsables: true
     }
   } );
 
@@ -96,7 +103,7 @@ const registrarProceso = async ( req = request, res = response ) => {
 
 const actualizarProceso = async ( req = request, res = response ) => {
   const { id } = req.params;
-  const { codigo, tipo, nivel, nombre, descripcion, parentId } = req.body;
+  const { codigo, tipo, nivel, nombre, descripcion, parentId, owners, objetivo, estrategico, alcance } = req.body;
 
 
   try {
@@ -196,7 +203,7 @@ const detalleProceso = async ( req = request, res = response ) => {
     const proceso = await prisma.proceso.findUnique( {
       where: { id: Number( id ) },
       include: {
-        dueños: true,
+        owners: true,
         hijos: true,
         parent: true,
         responsables: true,
@@ -318,6 +325,81 @@ const actualizarDiagrama = async ( req = request, res = response ) => {
   }
 };
 
+const listaOwners = async ( req = request, res = response ) => {
+  try {
+    const ownersDb = await prisma.owner.findMany( {     
+     orderBy: {
+      id: 'asc'
+     }
+    } );
+
+    if ( !ownersDb || ownersDb.length === 0 ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'No se encontraron dueños'
+      } );
+    }
+
+    res.json( {
+      ok: true,
+      msg: 'Lista de dueños',
+      ownersDb
+    } );
+  } catch ( error ) {
+    console.error( error );
+    res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al obtener la lista de dueños'
+    } );
+  }
+};
+
+const actualizarDescripcionProceso = async ( req = request, res = response ) => {
+  const { id } = req.params;
+  const { descripcion, tipo, nivel, objetivo, estrategico, alcance, owners } = req.body;
+
+  try {
+    // Verificar si el proceso existe
+    const procesoExistente = await prisma.proceso.findUnique( {
+      where: { id: Number( id ) }
+    } );
+
+    if ( !procesoExistente ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'Proceso no encontrado'
+      } );
+    }
+   
+    const procesoActualizado = await prisma.proceso.update( {
+      where: { id: Number( id ) },
+      data: {
+        descripcion: descripcion ?? procesoExistente.descripcion,
+        tipo: tipo ?? procesoExistente.tipo,
+        nivel: nivel ? +nivel : procesoExistente.nivel,
+        objetivo: objetivo ?? procesoExistente.objetivo,
+        estrategico: estrategico ?? procesoExistente.estrategico,
+        alcance: alcance ?? procesoExistente.alcance,        
+        owners: {
+          set: owners.map( owner => ( { id: Number( owner ) } ) )
+        }
+      }
+    } );
+
+    res.json( {
+      ok: true,
+      msg: 'Descripción del proceso actualizada',
+      procesoActualizado
+    } );
+  } catch ( error ) {
+    console.error( error );
+    res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al actualizar la descripción del proceso'
+    } );
+  }
+}
+
 module.exports = {
   listaProcesos,
   registrarProceso,
@@ -325,7 +407,9 @@ module.exports = {
   eliminarProceso,
   actualizarDiagrama,
   detalleProceso,
-  listaProcesosNivel0
+  listaProcesosNivel0,
+  listaOwners, 
+  actualizarDescripcionProceso
 };
 
 

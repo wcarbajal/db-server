@@ -37,14 +37,14 @@ model Usuario {
   procesosResponsable Proceso[] @relation("ProcesoResponsables")
 }
 
-model Dueño {
-  id        Int      @id @default(autoincrement())
-  oficina   String
-  siglas    String
-  director  String
-  correo    String
-  procesoId Int?
-  proceso   Proceso? @relation(fields: [procesoId], references: [id])
+model Owner {
+  id       Int    @id @default(autoincrement())
+  oficina  String
+  siglas   String
+  director String
+  correo   String
+
+  procesos Proceso[] @relation("ProcesoOwners")
 }
 
 enum TipoProceso {
@@ -60,13 +60,16 @@ model Proceso {
   tipo             TipoProceso
   nivel            Int
   descripcion      String?
+  objetivo         String?
+  estrategico      String?
+  alcance          String?
   parentId         Int?
   estado           Boolean?        @default(true)
   parent           Proceso?        @relation("ProcesoPadre", fields: [parentId], references: [id])
   hijos            Proceso[]       @relation("ProcesoPadre")
   creadoEn         DateTime        @default(now())
   actualizadoEn    DateTime        @updatedAt
-  dueños          Dueño[]
+  owners           Owner[]         @relation("ProcesoOwners")
   responsables     Usuario[]       @relation("ProcesoResponsables")
   detalleProceso   DetalleProceso? @relation(fields: [detalleProcesoId], references: [id])
   detalleProcesoId Int?            @unique
@@ -100,16 +103,13 @@ model Diagrama {
 }
 
 model Ficha {
-  id                   Int     @id @default(autoincrement())
-  objetivo             String?
-  objetivoEstratégico String?
-  alcance              String?
-  entradas             String?
-  salidas              String?
-  proveedores          String?
-  clientes             String?
-  riesgos              String?
-  registros            String?
+  id          Int     @id @default(autoincrement())
+  entradas    String?
+  salidas     String?
+  proveedores String?
+  clientes    String?
+  riesgos     String?
+  registros   String?
 
   DetalleProceso DetalleProceso?
 }
@@ -125,6 +125,7 @@ model Actividad {
   id              Int            @id @default(autoincrement())
   nombre          String
   descripcion     String?
+  unidadOperativa String?
   responsable     String
   procedimiento   Procedimiento? @relation(fields: [procedimientoId], references: [id])
   procedimientoId Int?
