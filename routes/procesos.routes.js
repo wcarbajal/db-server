@@ -4,7 +4,7 @@ const fileUpload = require('express-fileupload');
 
 
 
-const { listaProcesos, actualizarProceso, eliminarProceso, registrarProceso, detalleProceso, listaProcesosNivel0, actualizarDiagrama, listaOwners, actualizarDescripcionProceso } = require( '../controllers/procesos.controllers' );
+const { listaProcesos, actualizarProceso, eliminarProceso, registrarProceso, detalleProceso, listaProcesosNivel0, actualizarDiagrama, listaOwners, actualizarDescripcionProceso, registrarProcedimientoProceso } = require( '../controllers/procesos.controllers' );
 const { validarCampos, validarArchivo } = require( '../middlewares/validar-campos' );
 
 
@@ -85,6 +85,11 @@ router.delete( '/:id', [
   check( 'id', 'El ID debe ser un número entero' ).isInt(),
   validarCampos
 ], eliminarProceso );
+
+router.post( '/registrar-procedimiento/:id', [
+ 
+  validarCampos
+], registrarProcedimientoProceso );
 
 //
 

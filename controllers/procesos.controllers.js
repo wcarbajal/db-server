@@ -14,11 +14,23 @@ const listaProcesos = async ( req = request, res = response ) => {
       estado: true
     },
     include: {
-      detalleProceso: true,
+      detalleProceso: {
+        include: {
+          procedimientoRelacion: {
+            include: {
+              _count: true, 
+              actividades: true, 
+              DetalleProceso: true
+            }
+          }
+        }
+      },
       parent: true,
       hijos: true,
       owners: true,
-      responsables: true
+      responsables: true,
+
+
     }
   } );
 
@@ -271,9 +283,9 @@ const actualizarDiagrama = async ( req = request, res = response ) => {
     await file.mv( uploadPath );
 
     const url = `/diagrama-${ procesoExistente.codigo }.png`;
-    const fullUrl = req.protocol + '://' + req.get('host') + url;
+    const fullUrl = req.protocol + '://' + req.get( 'host' ) + url;
 
-    console.log("fullUrl", fullUrl)
+    console.log( "fullUrl", fullUrl );
 
 
     if ( procesoExistente.detalleProcesoId !== null ) {
@@ -327,10 +339,10 @@ const actualizarDiagrama = async ( req = request, res = response ) => {
 
 const listaOwners = async ( req = request, res = response ) => {
   try {
-    const ownersDb = await prisma.owner.findMany( {     
-     orderBy: {
-      id: 'asc'
-     }
+    const ownersDb = await prisma.owner.findMany( {
+      orderBy: {
+        id: 'asc'
+      }
     } );
 
     if ( !ownersDb || ownersDb.length === 0 ) {
@@ -370,7 +382,7 @@ const actualizarDescripcionProceso = async ( req = request, res = response ) => 
         msg: 'Proceso no encontrado'
       } );
     }
-   
+
     const procesoActualizado = await prisma.proceso.update( {
       where: { id: Number( id ) },
       data: {
@@ -379,7 +391,7 @@ const actualizarDescripcionProceso = async ( req = request, res = response ) => 
         nivel: nivel ? +nivel : procesoExistente.nivel,
         objetivo: objetivo ?? procesoExistente.objetivo,
         estrategico: estrategico ?? procesoExistente.estrategico,
-        alcance: alcance ?? procesoExistente.alcance,        
+        alcance: alcance ?? procesoExistente.alcance,
         owners: {
           set: owners.map( owner => ( { id: Number( owner ) } ) )
         }
@@ -398,7 +410,164 @@ const actualizarDescripcionProceso = async ( req = request, res = response ) => 
       msg: 'Error al actualizar la descripción del proceso'
     } );
   }
-}
+};
+
+const registrarProcedimientoProceso = async ( req = request, res = response ) => {
+
+  const { id } = req.params;
+  // TODO: ingreo de datos.
+  const { iddetalleproceso, idprocedimiento, actividades } = req.body;
+  console.log( iddetalleproceso, idprocedimiento, actividades );
+
+
+  try {
+    // Verificar si el proceso existe
+    const procesoExistente = await prisma.proceso.findUnique( {
+      where: { id: Number( id ) },
+      include: {
+        detalleProceso: {
+          include: {
+            procedimientoRelacion: true
+          }
+        }
+      }
+
+    } );
+
+    if ( !procesoExistente ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'Proceso no encontrado'
+      } );
+    }
+
+    if ( !iddetalleproceso ) {
+      // Si no existe detalleProceso, crearlo
+      await prisma.proceso.update( {
+        where: { id: Number( id ) },
+        data: {
+          detalleProceso: {
+            create: {}
+          }
+        }
+      } );
+      // guardar el procedimiento
+      await prisma.detalleProceso.update( {
+        where: { id: Number( procesoExistente.detalleProceso.id ) },
+        data: {
+          procedimientoRelacion: {
+            create: {
+              actividades
+            }
+          }
+        }
+      } );
+
+      return res.json( {
+        ok: true,
+        msg: 'Procedimiento registrado correctamente',
+        procedimiento: {
+          idprocedimiento,
+          actividades
+        }
+      } );
+    }
+
+
+    //verificar si el procedimiento existe
+    if ( !idprocedimiento ) {
+      // Si no existe, crearlo
+
+      await prisma.detalleProceso.update( {
+        where: { id: Number( procesoExistente.detalleProceso.id ) },
+        data: {
+          procedimientoRelacion: {
+            create: {
+              actividades: {
+                create: actividades
+              }
+            }
+          }
+        }
+      } );
+
+      return res.json( {
+        ok: true,
+        msg: 'Procedimiento creado correctamente',
+        procedimiento: {
+          idprocedimiento: idprocedimiento,
+          actividades
+        }
+      } );
+    }
+
+    //guardar el procedimiento
+    await prisma.procedimiento.update( {
+      where: { id: Number( idprocedimiento ) },
+      data: {
+        actividades
+      }
+    } );
+
+    res.json( {
+      ok: true,
+      msg: 'Procedimiento registrado correctamente',
+      procedimiento: {
+        idprocedimiento,
+        actividades
+      }
+    } );
+
+
+  } catch ( error ) {
+    console.error( error );
+    res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al registrar las actividades del procedimiento'
+    } );
+  }
+};
+
+
+
+
+
+const registrarIndicadorProceso = async ( req = request, res = response ) => {
+  const { id } = req.params;
+  const { iddetalleproceso, idindicador } = req.body;
+
+  try {
+    // Verificar si el proceso existe
+    const procesoExistente = await prisma.proceso.findUnique( {
+      where: { id: Number( id ) },
+      include: {
+        detalleProceso: {
+          include: {
+            indicadoresList: true
+          }
+        }
+      }
+    } );
+
+    if ( !procesoExistente ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'Proceso no encontrado'
+      } );
+    }
+
+    // si detalleProceso no existe, crearlo
+
+  } catch ( error ) {
+    console.error( error );
+    res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al registrar el indicador del proceso'
+    } );
+  }
+};
+
+
 
 module.exports = {
   listaProcesos,
@@ -408,8 +577,10 @@ module.exports = {
   actualizarDiagrama,
   detalleProceso,
   listaProcesosNivel0,
-  listaOwners, 
-  actualizarDescripcionProceso
+  listaOwners,
+  actualizarDescripcionProceso,
+  registrarProcedimientoProceso,
+  registrarIndicadorProceso,
 };
 
 
