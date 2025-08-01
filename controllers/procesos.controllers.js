@@ -14,24 +14,15 @@ const listaProcesos = async ( req = request, res = response ) => {
       estado: true
     },
     include: {
-      detalleProceso: {
-        include: {
-          procedimientoRelacion: {
-            include: {
-              _count: true, 
-              actividades: true, 
-              DetalleProceso: true
-            }
-          }
-        }
-      },
-      parent: true,
+      actividades: true,
+      diagrama: true,
+      ficha: true,
+      indicadores: true,
       hijos: true,
       owners: true,
-      responsables: true,
-
-
+      responsables: true
     }
+
   } );
 
 
@@ -215,18 +206,14 @@ const detalleProceso = async ( req = request, res = response ) => {
     const proceso = await prisma.proceso.findUnique( {
       where: { id: Number( id ) },
       include: {
-        owners: true,
+        actividades: true,
+        diagrama: true,
+        ficha: true,
+        indicadores: true,
         hijos: true,
-        parent: true,
+        owners: true,
         responsables: true,
-        detalleProceso: {
-          include: {
-            diagramaRelacion: true,
-            fichaRelacion: true,
-            procedimientoRelacion: true,
-            indicadoresList: true
-          }
-        },
+        parent: true
       }
     } );
 
@@ -288,39 +275,21 @@ const actualizarDiagrama = async ( req = request, res = response ) => {
     console.log( "fullUrl", fullUrl );
 
 
-    if ( procesoExistente.detalleProcesoId !== null ) {
-
-      await prisma.proceso.update( {
-        where: { id: Number( id ) },
-        data: {
-          detalleProceso: {
-            update: {
-              diagramaRelacion: {
-                update: {
-                  url: fullUrl
-                }
-              }
-            }
-          }
-        }
-      } );
-    } else {
-      await prisma.proceso.update( {
-        where: { id: Number( id ) },
-        data: {
-          detalleProceso: {
+    await prisma.proceso.update( {
+      where: { id: Number( id ) },
+      data: {
+        diagrama: {
+          upsert: {
             create: {
-              diagramaRelacion: {
-                create: {
-                  url: fullUrl
-                }
-              }
+              url: fullUrl
+            },
+            update: {
+              url: fullUrl
             }
           }
         }
-      } );
-    }
-
+      }
+    } );
 
     res.json( {
       ok: true,

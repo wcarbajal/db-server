@@ -18,7 +18,7 @@ datasource db {
 
 model Roles {
   id  Int    @id @default(autoincrement())
-  rol String
+  rol String @unique
 
   Usuario Usuario[]
 }
@@ -52,45 +52,42 @@ enum TipoProceso {
   Soporte
   Estratégico
 }
-
-model Proceso {
-  id               Int             @id @default(autoincrement())
-  codigo           String          @unique
-  nombre           String
-  tipo             TipoProceso
-  nivel            Int
-  descripcion      String?
-  objetivo         String?
-  estrategico      String?
-  alcance          String?
-  parentId         Int?
-  estado           Boolean?        @default(true)
-  parent           Proceso?        @relation("ProcesoPadre", fields: [parentId], references: [id])
-  hijos            Proceso[]       @relation("ProcesoPadre")
-  creadoEn         DateTime        @default(now())
-  actualizadoEn    DateTime        @updatedAt
-  owners           Owner[]         @relation("ProcesoOwners")
-  responsables     Usuario[]       @relation("ProcesoResponsables")
-  detalleProceso   DetalleProceso? @relation(fields: [detalleProcesoId], references: [id])
-  detalleProcesoId Int?            @unique
+model Mapa {
+  id            Int      @id @default(autoincrement())
+  nombre        String   @unique
+  descripcion   String?
+  entradas      String?
+  salidas       String?
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+  procesos      Proceso[]
 }
 
-model DetalleProceso {
-  id Int @id @default(autoincrement())
+model Proceso {
+  id            Int         @id @default(autoincrement())
+  codigo        String      @unique
+  nombre        String
+  tipo          TipoProceso
+  nivel         Int
+  descripcion   String?
+  objetivo      String?
+  estrategico   String?
+  alcance       String?
+  parentId      Int?
+  estado        Boolean?    @default(true)
+  parent        Proceso?    @relation("ProcesoPadre", fields: [parentId], references: [id])
+  hijos         Proceso[]   @relation("ProcesoPadre")
+  creadoEn      DateTime    @default(now())
+  actualizadoEn DateTime    @updatedAt
+  owners        Owner[]     @relation("ProcesoOwners")
+  responsables  Usuario[]   @relation("ProcesoResponsables")
 
-  procedimiento    String?
-  indicadores      String?
-  proceso          Proceso?
-  diagramaRelacion Diagrama? @relation(fields: [diagramaId], references: [id])
-  diagramaId       Int?      @unique
-
-  fichaRelacion Ficha? @relation(fields: [fichaId], references: [id])
-  fichaId       Int?   @unique
-
-  procedimientoRelacion Procedimiento? @relation(fields: [procedimientoId], references: [id])
-  procedimientoId       Int?           @unique
-
-  indicadoresList indicador[]
+  diagrama    Diagrama?
+  ficha       Ficha?
+  actividades Actividad[]
+  indicadores indicador[]
+  mapa        Mapa?       @relation(fields: [mapaId], references: [id])
+  mapaId      Int?
 }
 
 model Diagrama {
@@ -98,8 +95,8 @@ model Diagrama {
   url           String
   creadoEn      DateTime @default(now())
   actualizadoEn DateTime @updatedAt
-
-  detalleProceso DetalleProceso?
+  procesoId     Int      @unique
+  proceso       Proceso  @relation(fields: [procesoId], references: [id])
 }
 
 model Ficha {
@@ -110,25 +107,18 @@ model Ficha {
   clientes    String?
   riesgos     String?
   registros   String?
-
-  DetalleProceso DetalleProceso?
-}
-
-model Procedimiento {
-  id          Int         @id @default(autoincrement())
-  actividades Actividad[]
-
-  DetalleProceso DetalleProceso?
+  fichaId     Int     @unique
+  proceso     Proceso @relation(fields: [fichaId], references: [id])
 }
 
 model Actividad {
-  id              Int            @id @default(autoincrement())
+  id              Int     @id @default(autoincrement())
   nombre          String
   descripcion     String?
   unidadOperativa String?
   responsable     String
-  procedimiento   Procedimiento? @relation(fields: [procedimientoId], references: [id])
-  procedimientoId Int?
+  procesoId       Int
+  proceso         Proceso @relation(fields: [procesoId], references: [id])
 }
 
 model indicador {
@@ -142,8 +132,8 @@ model indicador {
   frecuencia      String?
   fuenteDatos     String?
   logrosEsperados String?
+  lineaBase       String?
 
-  lineaBase        String?
-  detalleProceso   DetalleProceso? @relation(fields: [detalleProcesoId], references: [id])
-  detalleProcesoId Int?
+  procesoId Int
+  proceso   Proceso @relation(fields: [procesoId], references: [id])
 }

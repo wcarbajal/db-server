@@ -1,18 +1,18 @@
 const { PrismaClient } = require( '@prisma/client' );
 const prisma = new PrismaClient();
-//const bcryptjs = require( 'bcryptjs' );
+const bcryptjs = require( 'bcryptjs' );
 
 
 async function main() {
   // Crear roles
-/*   await prisma.roles.createMany( {
+  await prisma.roles.createMany( {
     data: [
       { rol: 'ADMIN' },
       { rol: 'USER' }
     ],
     skipDuplicates: true
   } );
- */
+
   // crear dueños
   await prisma.owner.createMany( {
     data: [
@@ -45,8 +45,16 @@ async function main() {
   } );
 
   // Crear procesos
- /*  await prisma.proceso.createMany( {
+   await prisma.proceso.createMany( { 
     data: [
+      { codigo: "M1", nombre: "Diseño de instrumentos para la gestión del beneficio​s", tipo: "Misional", nivel: 0, descripcion: "Diseño y actualización de instrumentos para la gestión del beneficio​", parentId: null, estado: true },
+      { codigo: "M2", nombre: "Gestión del otorgamiento del beneficio", tipo: "Misional", nivel: 0, descripcion: "Gestión del otorgamiento del beneficio", parentId: null, estado: true },
+      { codigo: "M3", nombre: "Gestión de la continuidad del beneficio", tipo: "Misional", nivel: 0, descripcion: "Gestión de la continuidad del beneficio", parentId: null, estado: true },
+      { codigo: "M4", nombre: "Gestión de la recuperación del beneficio", tipo: "Misional", nivel: 0, descripcion: "Gestión de la recuperación del beneficio", parentId: null, estado: true },
+      { codigo: "E1", nombre: "Planificación estratégica​", tipo: "Estratégico", nivel: 0, descripcion: "Gestión de la Planificación estratégica​", parentId: null, estado: true },
+      { codigo: "E2", nombre: "Gestión de la mejora continua e innovación institucional​", tipo: "Estratégico", nivel: 0, descripcion: "Gestión de la mejora continua e innovación institucional​", parentId: null, estado: true },
+      { codigo: "E3", nombre: "Gestión de estrategias de comunicación, cooperación y relaciones internacionales​", tipo: "Estratégico", nivel: 0, descripcion: "Gestión de estrategias de comunicación, cooperación y relaciones internacionales​", parentId: null, estado: true },
+      { codigo: "E4", nombre: "Gestión de control y riesgos", tipo: "Estratégico", nivel: 0, descripcion: "Gestión de control y riesgos", parentId: null, estado: true },
       { codigo: "S1", nombre: "Gestión de recursos humanos", tipo: "Soporte", nivel: 0, descripcion: "Gestión de recursos humanos", parentId: null, estado: true },
       { codigo: "S1.1", nombre: "Organización del trabajo", tipo: "Soporte", nivel: 1, descripcion: "Organización del trabajo", parentId: 1, estado: true },
       { codigo: "S1.1.1", nombre: "Diseño de puestos", tipo: "Soporte", nivel: 2, descripcion: "Diseño de puestos", parentId: 2, estado: true },
@@ -115,17 +123,22 @@ async function main() {
       { codigo: "S1.5.5", nombre: "Comunicación interna", tipo: "Soporte", nivel: 2, descripcion: "Comunicación interna", parentId: 50, estado: true },
       { codigo: "S1.5.5.1", nombre: "Definicion del plan de comunicación interna", tipo: "Soporte", nivel: 3, descripcion: "Definicion del plan de comunicación interna", parentId: 66, estado: true },
       { codigo: "S1.5.5.2", nombre: "Ejecución del plan de comunicación interna", tipo: "Soporte", nivel: 3, descripcion: "Ejecución del plan de comunicación interna", parentId: 66, estado: true },
+      { codigo: "S2", nombre: "Administración de recursos financieros", tipo: "Soporte", nivel: 0, descripcion: "Administración de recursos financieros", parentId: null, estado: true },
+      { codigo: "S3", nombre: "Gestión de abastecimiento", tipo: "Soporte", nivel: 0, descripcion: "Gestión de abastecimiento", parentId: null, estado: true },
+      { codigo: "S4", nombre: "Gestión de tecnologías de la información y comunicación", tipo: "Soporte", nivel: 0, descripcion: "Gestión de tecnologías de la información y comunicación", parentId: null, estado: true },
+      { codigo: "S5", nombre: "Atención de asuntos jurídicos", tipo: "Soporte", nivel: 0, descripcion: "Atención de asuntos jurídicos", parentId: null, estado: true },
+      { codigo: "S6", nombre: "Atención al ciudadano y administración del archivo", tipo: "Soporte", nivel: 0, descripcion: "Atención al ciudadano y administración del archivo", parentId: null, estado: true },
 
 
     ],
     skipDuplicates: true
-  } ); */
+  } );
 
   // Obtener el rol ADMIN
 
 
   // Crear usuario admin
- /*  const passwordHash = bcryptjs.hashSync( '123456', 10 );
+  const passwordHash = bcryptjs.hashSync( '123456', 10 );
 
   await prisma.usuario.create( {
     data: {
@@ -137,7 +150,7 @@ async function main() {
       google: false,
       online: false
     }
-  } );*/
+  } );
 } 
 
 main()
