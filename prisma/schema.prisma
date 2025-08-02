@@ -52,14 +52,16 @@ enum TipoProceso {
   Soporte
   Estratégico
 }
+
 model Mapa {
-  id            Int      @id @default(autoincrement())
-  nombre        String   @unique
+  id            Int       @id @default(autoincrement())
+  nombre        String    @unique
+  ruc           String    @unique
   descripcion   String?
   entradas      String?
   salidas       String?
-  creadoEn      DateTime @default(now())
-  actualizadoEn DateTime @updatedAt
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
   procesos      Proceso[]
 }
 

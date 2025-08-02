@@ -12,7 +12,7 @@ async function main() {
     ],
     skipDuplicates: true
   } );
-
+/* 
   // crear dueños
   await prisma.owner.createMany( {
     data: [
@@ -133,7 +133,7 @@ async function main() {
     ],
     skipDuplicates: true
   } );
-
+ */
   // Obtener el rol ADMIN
 
 
