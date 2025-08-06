@@ -10,15 +10,15 @@ const { validarCampos, validarArchivo } = require( '../middlewares/validar-campo
 
 const router = Router();
 
-router.get( '/', [
+router.get( '/:idMapa', [
 
   validarCampos
 ], listaProcesos );
 
-router.get( '/nivel0', [
+/* router.get( '/nivel0', [
 
   validarCampos
-], listaProcesosNivel0 );
+], listaProcesosNivel0 ); */
 
 router.post( '/actualizar-diagrama/:id', [ 
   fileUpload(),
@@ -30,14 +30,10 @@ router.get( '/detalle/:id', [
   validarCampos
 ], detalleProceso );
 
-router.get( '/owners', [
-
-  validarCampos
-], listaOwners );
 
 /* fetchConToken(`procesos/actualizar-diagrama/${procesoId}`, formData, "POST"); */
 
-router.post( '/registrar', [
+router.post( '/:idMapa/registrar', [
   check( 'codigo', 'El código es obligatorio' ).not().isEmpty(),
   check( 'codigo', 'El código debe tener entre 2 y 30 caracteres' ).isLength( { min: 2, max: 30 } ),
   check( 'nombre', 'El nombre es obligatorio' ).not().isEmpty(),

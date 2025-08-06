@@ -7,89 +7,91 @@ const prisma = new PrismaClient();
 
 
 const listaProcesos = async ( req = request, res = response ) => {
+  const { idMapa } = req.params;
 
 
-  const procesos = await prisma.proceso.findMany( {
-    where: {
-      estado: true
-    },
-    include: {
-      actividades: true,
-      diagrama: true,
-      ficha: true,
-      indicadores: true,
-      hijos: true,
-      owners: true,
-      responsables: true
-    }
-
-  } );
-
-
-  if ( !procesos || procesos.length === 0 ) {
-    return res.status( 404 ).json( {
-      ok: false,
-      msg: 'No se encontraron procesos'
-    } );
-  }
-  res.json( {
-    ok: true,
-    msg: 'Lista de procesos',
-    procesos
-  } );
-};
-
-const listaProcesosNivel0 = async ( req = request, res = response ) => {
-
-
-  const procesos = await prisma.proceso.findMany( {
+  const procesos = await prisma.mapa.findMany( {
     where: {
       estado: true,
-      nivel: 0
+      id: Number( idMapa )
+    },
+    select: {
+      procesos: {
+        where: {
+          estado: true
+        },
+        orderBy: {
+          nivel: 'asc'
+        }
+      }
     }
+
   } );
 
 
-  if ( !procesos || procesos.length === 0 ) {
+  if ( !procesos || procesos.length === 0 || !procesos[ 0 ].procesos || procesos[ 0 ].procesos.length === 0 ) {
     return res.status( 404 ).json( {
       ok: false,
-      msg: 'No se encontraron procesos'
+      msg: 'No se encontraron procesos',
+      procesos: []
     } );
   }
   res.json( {
     ok: true,
     msg: 'Lista de procesos',
-    procesos
+    procesos: procesos[ 0 ].procesos
   } );
 };
 
+
 const registrarProceso = async ( req = request, res = response ) => {
+
+  const { idMapa } = req.params;
 
   const { codigo, tipo, nivel, nombre, descripcion, parentId } = req.body;
 
   try {
     // Verificar si el código ya existe
-    const existeCodigo = await prisma.proceso.findUnique( {
-      where: { codigo }
+
+    const existeCodigo = await prisma.mapa.findUnique( {
+      where: { id: Number( idMapa ) },
+      select: {
+        procesos: {
+          where: {
+            codigo,
+            estado: true
+          }
+        }
+      }
     } );
     // Si el código ya existe, retornar un error
-    if ( existeCodigo ) {
+    if ( existeCodigo && existeCodigo.procesos.length > 0 ) {
       return res.status( 400 ).json( {
         ok: false,
-        msg: 'El código ya se encuentra registrado'
+        msg: 'El código ya se encuentra registrado',
+        proceso: []
       } );
     }
 
-    const nuevoProceso = await prisma.proceso.create( {
-      data: {
-        codigo,
-        nombre,
-        tipo,
-        nivel: +nivel,
-        descripcion,
-        parentId: parentId ? Number( parentId ) : null
+    const data = {
+      codigo,
+      nombre,
+      tipo,
+      nivel: +nivel,
+      descripcion,
+      mapa: {
+        connect: { id: Number( idMapa ) }
       }
-    } );
+    };
+
+    if ( parentId ) {
+      data.parent = {
+        connect: { id: Number( parentId ) }
+      };
+    }
+
+    const nuevoProceso = await prisma.proceso.create( { data } );
+
     res.status( 201 ).json( {
       ok: true,
       msg: 'Proceso registrado',
@@ -106,6 +108,7 @@ const registrarProceso = async ( req = request, res = response ) => {
 
 const actualizarProceso = async ( req = request, res = response ) => {
   const { id } = req.params;
+
   const { codigo, tipo, nivel, nombre, descripcion, parentId, owners, objetivo, estrategico, alcance } = req.body;
 
 
@@ -306,34 +309,7 @@ const actualizarDiagrama = async ( req = request, res = response ) => {
   }
 };
 
-const listaOwners = async ( req = request, res = response ) => {
-  try {
-    const ownersDb = await prisma.owner.findMany( {
-      orderBy: {
-        id: 'asc'
-      }
-    } );
 
-    if ( !ownersDb || ownersDb.length === 0 ) {
-      return res.status( 404 ).json( {
-        ok: false,
-        msg: 'No se encontraron dueños'
-      } );
-    }
-
-    res.json( {
-      ok: true,
-      msg: 'Lista de dueños',
-      ownersDb
-    } );
-  } catch ( error ) {
-    console.error( error );
-    res.status( 500 ).json( {
-      ok: false,
-      msg: 'Error al obtener la lista de dueños'
-    } );
-  }
-};
 
 const actualizarDescripcionProceso = async ( req = request, res = response ) => {
   const { id } = req.params;
@@ -544,9 +520,7 @@ module.exports = {
   actualizarProceso,
   eliminarProceso,
   actualizarDiagrama,
-  detalleProceso,
-  listaProcesosNivel0,
-  listaOwners,
+  detalleProceso,  
   actualizarDescripcionProceso,
   registrarProcedimientoProceso,
   registrarIndicadorProceso,

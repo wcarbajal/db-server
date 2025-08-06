@@ -43,6 +43,7 @@ model Owner {
   siglas   String
   director String
   correo   String
+  estado   Boolean @default(true)
 
   procesos Proceso[] @relation("ProcesoOwners")
 }
@@ -58,10 +59,11 @@ model Mapa {
   nombre        String    @unique
   ruc           String    @unique
   descripcion   String?
-  entradas      String?
-  salidas       String?
+  entrada       String?
+  salida        String?
   creadoEn      DateTime  @default(now())
   actualizadoEn DateTime  @updatedAt
+  estado        Boolean   @default(true)
   procesos      Proceso[]
 }
 

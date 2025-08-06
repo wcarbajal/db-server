@@ -17,6 +17,7 @@ class Server {
     this.loginPath = '/api/login';
     this.procesosPath = '/api/procesos';
     this.mapaPath = '/api/mapa';
+    this.ownersPath = '/api/owners';
 
 
     // Http server
@@ -39,8 +40,10 @@ class Server {
     this.app.use( this.loginPath, require( '../routes/auth.routes' ) );
     this.app.use( this.procesosPath, validarJWT, require( '../routes/procesos.routes' ) );
     this.app.use( this.mapaPath, validarJWT, require( '../routes/mapa.routes' ) );
+    this.app.use( this.ownersPath, validarJWT, require( '../routes/owners.routes' ) );
 
-  }
+
+  } 
 
 
   listen() {

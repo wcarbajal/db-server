@@ -1,83 +1,306 @@
 const fs = require( 'fs/promises' );
 const { PrismaClient } = require( '@prisma/client' );
 const { request, response } = require( 'express' );
+const { map } = require( 'zod' );
 
 
 const prisma = new PrismaClient();
 
-const listaMapa = async ( req = request, res = response ) => {
+const listarMapa = async ( req = request, res = response ) => {
 
-  const mapa = await prisma.mapa.findMany({})
+  const mapas = await prisma.mapa.findMany( {
+    where: {
+      estado: true
+    }
+  } );
 
-  if ( !mapa || mapa.length === 0 ) {
-    return res.status(404).json({
+  if ( !mapas || mapas.length === 0 ) {
+    return res.status( 404 ).json( {
       ok: false,
-      msg: 'No se encontraron mapas'
-    });
+      msg: 'No se encontraron mapas',
+      mapa: []
+    } );
   }
 
-  res.json({
+  res.json( {
     ok: true,
     msg: 'Lista de mapas',
-    mapa
-  });
-}
+    mapas
+  } );
+};
 
 const registrarMapa = async ( req = request, res = response ) => {
 
-  const { ruc, nombre, entrada, salida } = req.body;
+  const { ruc, nombre, entrada, salida, descripcion } = req.body;
 
- try {
-  // Validar que el mapa no exista
-  const mapaExistente = await prisma.mapa.findFirst({
-    where: {
-      OR: [
-        { ruc },
-        { nombre }
-      ]
+  console.log("Valores recibidos:", { ruc, nombre, entrada, salida, descripcion });
+
+  try {
+    // Validar que el mapa no exista
+    const mapaExistente = await prisma.mapa.findFirst( {
+      where: {
+        OR: [
+          { ruc },
+          { nombre }
+        ]
+      }
+
+    } );
+
+    if ( mapaExistente ) {
+      return res.status( 400 ).json( {
+        ok: false,
+        msg: 'El mapa ya existe,  nombre o RUC duplicados',
+        nombre: mapaExistente.nombre,
+        ruc: mapaExistente.ruc
+      } );
     }
 
-  });
+    const mapa = await prisma.mapa.create( {
+      data: {
+        ruc: ruc,
+        nombre,
+        entrada,
+        salida,
+        descripcion
+      }
+    } );
 
-  if ( mapaExistente ) {
-    return res.status(400).json({
-      ok: false,
-      msg: 'El mapa ya existe,  nombre o RUC duplicados',
-      nombre: mapaExistente.nombre,
-      ruc: mapaExistente.ruc
-    });
-  }
+    res.json( {
+      ok: true,
+      msg: 'Mapa registrado',
+      mapa
+    } );
 
-  const mapa = await prisma.mapa.create({
-    data: {
-      nombre,
-      entrada,
-      salida
-    }
-  });
-
-  res.json({
-    ok: true,
-    msg: 'Mapa registrado',
-    mapa
-  });
-  
- } catch (error) {
+  } catch ( error ) {
     console.error( "Error al registrar el mapa:", error );
-    return res.status(500).json({
+    return res.status( 500 ).json( {
       ok: false,
       msg: 'Error al registrar el mapa'
-    });
+    } );
   }
-  
- }
+
+};
 
 
+const eliminarMapa = async ( req = request, res = response ) => {
 
-    
+  const { id } = req.params;
 
+  try {
+    const mapaExistente = await prisma.mapa.findUnique( {
+      where: {
+        id: parseInt( id )
+      }
+    } );
+
+    if ( !mapaExistente ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'Mapa no encontrado',
+        mapa: null
+      } );
+    }
+
+    const mapa = await prisma.mapa.update( {
+      where: {
+        id: parseInt( id )
+      },
+      data: {
+        estado: false,
+        ruc: mapaExistente.ruc + ' - Eliminado' + new Date().toISOString(),
+        nombre: mapaExistente.nombre + ' - Eliminado' + new Date().toISOString(),
+      }
+    } );
+
+    res.json( {
+      ok: true,
+      msg: 'Mapa eliminado',
+      mapa
+    } );
+
+  } catch ( error ) {
+    console.error( "Error al eliminar el mapa:", error );
+    return res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al eliminar el mapa'
+    } );
+  }
+
+};
+
+
+const actualizarMapa = async ( req = request, res = response ) => {
+  const { id } = req.params;
+  const { ruc, nombre, entrada, salida, descripcion } = req.body;
+
+  try {
+    const mapaExistente = await prisma.mapa.findUnique( {
+      where: {
+        id: parseInt( id )
+      }
+    } );
+
+    if ( !mapaExistente ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'Mapa no encontrado',
+        mapa: null
+      } );
+    }
+
+    const mapaDuplicado = await prisma.mapa.findMany( {
+      where: {
+        NOT: { id: parseInt( id ) },
+        OR: [
+          { ruc },
+          { nombre }
+        ]
+      }
+    } );
+
+    if ( mapaDuplicado.length > 0 ) {
+      return res.status( 400 ).json( {
+        ok: false,
+        msg: 'El nuevo nombre  o RUC, ya se encuentran registrados',
+        nombre: mapaDuplicado.map( m => m.nombre ),
+        ruc: mapaDuplicado.map( m => m.ruc )
+      } );
+    }
+
+    const mapaActualizado = await prisma.mapa.update( {
+      where: {
+        id: parseInt( id )
+      },
+      data: {
+        ruc,
+        nombre,
+        entrada,
+        salida,
+        descripcion: descripcion || ""
+      }
+    } );
+
+    res.json( {
+      ok: true,
+      msg: 'Mapa actualizado',
+      mapa: mapaActualizado
+    } );
+
+  } catch ( error ) {
+    console.error( "Error al actualizar el mapa:", error );
+    return res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al actualizar el mapa'
+    } );
+  }
+};
+
+const listarProcesosNivelCero = async ( req = request, res = response ) => {
+
+  const { id } = req.params;
+
+  try {
+    const procesosNivel0 = await prisma.mapa.findMany( {
+      where: {
+        id: parseInt( id ),
+        estado: true
+      },
+      select: {
+        procesos: {
+          where: {
+            nivel: 0
+          }
+        }
+      }
+    } );
+
+    //const procesos = procesosNivel0.length > 0 ? procesosNivel0[0].procesos : [];
+
+    if ( !procesosNivel0 || procesosNivel0.length === 0 ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'No se encontraron procesos de nivel 0'        
+      } );
+    }
+
+    const procesos = procesosNivel0[0].procesos
+
+    res.status(200).json( {
+      ok: true,
+      msg: 'Lista de procesos de nivel 0',
+      procesos
+      
+    } );
+
+  } catch ( error ) {
+    console.error( "Error al listar procesos de nivel 0:", error );
+    return res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al listar procesos de nivel 0'
+    } );
+  }
+};
+
+const listarProcesos = async ( req = request, res = response ) => {
+  const { id } = req.params;  
+
+  try {
+
+    const mapa = await prisma.mapa.findMany( {
+      where: {
+        id: parseInt( id ),
+        estado: true
+      }
+    } );
+
+    if ( !mapa || mapa.length === 0 ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'No se encontró el mapa',        
+      } );
+    }
+
+    const procesosList = await prisma.mapa.findMany( {
+      where: {
+        id: parseInt( id ),
+        estado: true
+      }, 
+      select: {
+        procesos: true
+      }
+    } );
+
+    //const procesos = procesosList.length > 0 ? procesosList[0].procesos : [];
+    if ( !procesosList || procesosList.length === 0 ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'No se encontraron procesos asociados al mapa',
+        procesos: []
+      } );
+    }
+    const procesos = procesosList[0].procesos;
+    res.status( 200 ).json( {
+      ok: true,
+      msg: 'Lista de procesos asociados al mapa',
+      procesos
+    } );
+
+  } catch ( error ) {
+    console.error( "Error al listar procesos:", error );
+    return res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al listar procesos'
+    } );
+  }
+
+}
 
 module.exports = {
-  listaMapa,
-  registrarMapa
-}
+  listarMapa,
+  registrarMapa,
+  eliminarMapa,
+  actualizarMapa,
+  listarProcesosNivelCero, 
+  listarProcesos
+};
