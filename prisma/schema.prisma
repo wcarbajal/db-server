@@ -25,7 +25,9 @@ model Roles {
 
 model Usuario {
   id                  Int       @id @default(autoincrement())
-  nombre              String    @default("John Doe")
+  nombre              String    @default("John")
+  apellidoPaterno     String?
+  apellidoMaterno     String?
   correo              String    @unique
   password            String
   rol                 Roles     @relation(fields: [rolesId], references: [id])
@@ -38,7 +40,7 @@ model Usuario {
 }
 
 model Owner {
-  id       Int    @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   oficina  String
   siglas   String
   director String

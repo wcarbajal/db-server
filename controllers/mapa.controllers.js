@@ -33,7 +33,7 @@ const registrarMapa = async ( req = request, res = response ) => {
 
   const { ruc, nombre, entrada, salida, descripcion } = req.body;
 
-  console.log("Valores recibidos:", { ruc, nombre, entrada, salida, descripcion });
+  console.log( "Valores recibidos:", { ruc, nombre, entrada, salida, descripcion } );
 
   try {
     // Validar que el mapa no exista
@@ -220,17 +220,17 @@ const listarProcesosNivelCero = async ( req = request, res = response ) => {
     if ( !procesosNivel0 || procesosNivel0.length === 0 ) {
       return res.status( 404 ).json( {
         ok: false,
-        msg: 'No se encontraron procesos de nivel 0'        
+        msg: 'No se encontraron procesos de nivel 0'
       } );
     }
 
-    const procesos = procesosNivel0[0].procesos
+    const procesos = procesosNivel0[ 0 ].procesos;
 
-    res.status(200).json( {
+    res.status( 200 ).json( {
       ok: true,
       msg: 'Lista de procesos de nivel 0',
       procesos
-      
+
     } );
 
   } catch ( error ) {
@@ -243,7 +243,7 @@ const listarProcesosNivelCero = async ( req = request, res = response ) => {
 };
 
 const listarProcesos = async ( req = request, res = response ) => {
-  const { id } = req.params;  
+  const { id } = req.params;
 
   try {
 
@@ -257,7 +257,7 @@ const listarProcesos = async ( req = request, res = response ) => {
     if ( !mapa || mapa.length === 0 ) {
       return res.status( 404 ).json( {
         ok: false,
-        msg: 'No se encontró el mapa',        
+        msg: 'No se encontró el mapa',
       } );
     }
 
@@ -265,7 +265,7 @@ const listarProcesos = async ( req = request, res = response ) => {
       where: {
         id: parseInt( id ),
         estado: true
-      }, 
+      },
       select: {
         procesos: true
       }
@@ -279,7 +279,7 @@ const listarProcesos = async ( req = request, res = response ) => {
         procesos: []
       } );
     }
-    const procesos = procesosList[0].procesos;
+    const procesos = procesosList[ 0 ].procesos;
     res.status( 200 ).json( {
       ok: true,
       msg: 'Lista de procesos asociados al mapa',
@@ -294,13 +294,66 @@ const listarProcesos = async ( req = request, res = response ) => {
     } );
   }
 
-}
+};
+
+const infoCantidades = async ( req = request, res = response ) => {
+  try {
+    const mapasCount = await prisma.mapa.count( {
+      where: {
+        estado: true
+      }
+    } );
+
+    const procesosCount = await prisma.proceso.count( {
+      where: {
+        estado: true
+      }
+    } );
+
+    const ownersCount = await prisma.owner.count( {
+      where: {
+        estado: true
+      }
+    } );
+
+    const usuariosCount = await prisma.usuario.count( {
+      where: {
+        estado: true
+      }
+    } );
+
+   /*  const reportesCount = await prisma.reporte.count( {
+      where: {
+        estado: true
+      }
+    } ); */
+
+    res.json( {
+      ok: true,
+      msg: 'Cantidades de entidades',
+      mapas: mapasCount === null ? 0 : mapasCount,
+      procesos: procesosCount === null ? 0 : procesosCount,
+      owners: ownersCount === null ? 0 : ownersCount,
+      usuarios: usuariosCount === null ? 0 : usuariosCount,
+      reportes: 0
+
+    } );
+
+  } catch ( error ) {
+    console.error( "Error al obtener cantidades:", error );
+    return res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al obtener cantidades'
+    } );
+  }
+};
 
 module.exports = {
   listarMapa,
   registrarMapa,
   eliminarMapa,
   actualizarMapa,
-  listarProcesosNivelCero, 
-  listarProcesos
+  listarProcesosNivelCero,
+  listarProcesos,
+  infoCantidades
 };

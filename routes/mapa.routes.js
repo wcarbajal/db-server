@@ -1,7 +1,7 @@
 const { Router } = require( 'express' );
 const {  check } = require( 'express-validator' );
 const { validarCampos } = require( '../middlewares/validar-campos' );
-const { listarMapa, listarProcesos, registrarMapa, eliminarMapa, actualizarMapa, listarProcesosNivelCero } = require( '../controllers/mapa.controllers' );
+const { listarMapa, listarProcesos, registrarMapa, eliminarMapa, actualizarMapa, listarProcesosNivelCero, infoCantidades } = require( '../controllers/mapa.controllers' );
 
 
 const router = Router();
@@ -17,6 +17,10 @@ router.get( '/:id/primer-nivel', [
 router.get( '/:id/procesos-lista', [
   validarCampos
 ], listarProcesos );
+
+router.get( '/cantidades', [  
+  validarCampos
+], infoCantidades );  
 
 
 
