@@ -357,121 +357,7 @@ const actualizarDescripcionProceso = async ( req = request, res = response ) => 
   }
 };
 
-const registrarProcedimientoProceso = async ( req = request, res = response ) => {
 
-  const { id } = req.params;
-  // TODO: ingreo de datos.
-  const { iddetalleproceso, idprocedimiento, actividades } = req.body;
-  console.log( iddetalleproceso, idprocedimiento, actividades );
-
-
-  try {
-    // Verificar si el proceso existe
-    const procesoExistente = await prisma.proceso.findUnique( {
-      where: { id: Number( id ) },
-      include: {
-        detalleProceso: {
-          include: {
-            procedimientoRelacion: true
-          }
-        }
-      }
-
-    } );
-
-    if ( !procesoExistente ) {
-      return res.status( 404 ).json( {
-        ok: false,
-        msg: 'Proceso no encontrado'
-      } );
-    }
-
-    if ( !iddetalleproceso ) {
-      // Si no existe detalleProceso, crearlo
-      await prisma.proceso.update( {
-        where: { id: Number( id ) },
-        data: {
-          detalleProceso: {
-            create: {}
-          }
-        }
-      } );
-      // guardar el procedimiento
-      await prisma.detalleProceso.update( {
-        where: { id: Number( procesoExistente.detalleProceso.id ) },
-        data: {
-          procedimientoRelacion: {
-            create: {
-              actividades
-            }
-          }
-        }
-      } );
-
-      return res.json( {
-        ok: true,
-        msg: 'Procedimiento registrado correctamente',
-        procedimiento: {
-          idprocedimiento,
-          actividades
-        }
-      } );
-    }
-
-
-    //verificar si el procedimiento existe
-    if ( !idprocedimiento ) {
-      // Si no existe, crearlo
-
-      await prisma.detalleProceso.update( {
-        where: { id: Number( procesoExistente.detalleProceso.id ) },
-        data: {
-          procedimientoRelacion: {
-            create: {
-              actividades: {
-                create: actividades
-              }
-            }
-          }
-        }
-      } );
-
-      return res.json( {
-        ok: true,
-        msg: 'Procedimiento creado correctamente',
-        procedimiento: {
-          idprocedimiento: idprocedimiento,
-          actividades
-        }
-      } );
-    }
-
-    //guardar el procedimiento
-    await prisma.procedimiento.update( {
-      where: { id: Number( idprocedimiento ) },
-      data: {
-        actividades
-      }
-    } );
-
-    res.json( {
-      ok: true,
-      msg: 'Procedimiento registrado correctamente',
-      procedimiento: {
-        idprocedimiento,
-        actividades
-      }
-    } );
-
-
-  } catch ( error ) {
-    console.error( error );
-    res.status( 500 ).json( {
-      ok: false,
-      msg: 'Error al registrar las actividades del procedimiento'
-    } );
-  }
-};
 
 
 
@@ -512,7 +398,159 @@ const registrarIndicadorProceso = async ( req = request, res = response ) => {
   }
 };
 
+// TODO: registrar actividades
 
+const registrarActividadesProceso = async ( req = request, res = response ) => {
+
+  const { id } = req.params;
+  const { actividades } = req.body;
+
+  console.log( "Actividades recibidas:", actividades );
+
+  try {
+    // Verificar si el proceso existe
+    const procesoExistente = await prisma.proceso.findUnique( {
+      where: { id: Number( id ) },
+
+    } );
+
+    if ( !procesoExistente ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'Proceso no encontrado'
+      } );
+    }
+    console.log( "el proceso existe" );
+
+    let maxNumOrden = await prisma.actividad.aggregate( {
+      where: { procesoId: Number( id ) },
+      _max: { numOrden: true }
+    } );
+
+    console.log( { maxNumOrden } );
+
+    let siguienteNumOrden = ( maxNumOrden._max.numOrden ?? 0 ) + 1;
+
+    console.log( "siguienteNumOrden", siguienteNumOrden );
+
+    //todo: del array de actividades que recibo, debo actualizar las actividades que existan y las que no existen, se deben de crear
+    const actividadesActualizadas = await Promise.all(
+      actividades.map( async ( actividad ) => {
+        if ( actividad.id ) {
+          // Actualizar actividad existente
+          return await prisma.actividad.update( {
+            where: { id: Number( actividad.id ) },
+            data: {
+              nombre: actividad.nombre,
+              descripcion: actividad.descripcion,
+              unidadOperativa: actividad.unidadOperativa,
+              numOrden: actividad.numOrden,
+              responsable: actividad.responsable
+            }
+          } );
+        } else {
+
+          const numOrdenAsignado = actividad.numOrden ?? siguienteNumOrden++;
+
+          // Crear nueva actividad
+          return await prisma.actividad.create( {
+            data: {
+              nombre: actividad.nombre,
+              descripcion: actividad.descripcion,
+              unidadOperativa: actividad.unidadOperativa,
+              responsable: actividad.responsable,
+              numOrden: numOrdenAsignado, // Asignar un número de orden si no se proporciona            
+              procesoId: Number( id )
+            }
+          } );
+        }
+      } ) );
+
+    console.log( "Actividades actualizadas:", actividadesActualizadas );
+
+    res.json( {
+      ok: true,
+      msg: 'Actividades del proceso actualizadas',
+      actividadesActualizadas
+    } );
+
+  } catch ( error ) {
+    console.error( error );
+    res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al registrar el indicador del proceso'
+    } );
+  }
+};
+
+const registrarInputOutput = async ( req = request, res = response ) => {
+  
+  const { id } = req.params;
+  const { inputOutput } = req.body;
+
+  try {
+    // Verificar si el proceso existe
+    const procesoExistente = await prisma.proceso.findUnique( {
+      where: { id: Number( id ) },
+    } );
+
+    if ( !procesoExistente ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'Proceso no encontrado'
+      } );
+    }
+
+    //verificar si ya tiene una fichaa creada, sino crearlo
+
+    let fichaId;
+
+    const fichaExistente = await prisma.ficha.findUnique( {
+      where: { procesoId: Number( id ) }
+    } );
+
+    if ( !fichaExistente ) {
+      // Crear ficha si no existe
+      const fichaCreada = await prisma.ficha.create( {
+        data: {
+          procesoId: Number( id ),
+        }
+      } );
+      fichaId = fichaCreada.id;
+    } else {
+      fichaId = fichaExistente.id;
+    }
+
+    // Registrar inputOutput que llega como una array
+    const nuevosInputOutput = await Promise.all(
+      inputOutput.map( async ( io ) => {
+        return await prisma.inputOutput.create( {
+          data: {
+            fichaId: Number( fichaId ),
+            entradas: io.entrada,
+            salidas: io.salida,
+            proveedores: io.proveedores,
+            clientes: io.clientes,
+
+          }
+        } );
+      } )
+    );
+
+  res.json( {
+    ok: true,
+    msg: 'Input/Output registrado',
+    nuevosInputOutput
+  } );
+
+} catch ( error ) {
+  console.error( error );
+  res.status( 500 ).json( {
+    ok: false,
+    msg: 'Error al registrar el Input/Output del proceso'
+  } );
+}
+};
 
 module.exports = {
   listaProcesos,
@@ -520,10 +558,11 @@ module.exports = {
   actualizarProceso,
   eliminarProceso,
   actualizarDiagrama,
-  detalleProceso,  
+  detalleProceso,
   actualizarDescripcionProceso,
-  registrarProcedimientoProceso,
   registrarIndicadorProceso,
+  registrarActividadesProceso,
+  registrarInputOutput,
 };
 
 

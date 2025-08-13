@@ -18,6 +18,7 @@ class Server {
     this.procesosPath = '/api/procesos';
     this.mapaPath = '/api/mapa';
     this.ownersPath = '/api/owners';
+    this.fichaPath = '/api/ficha';
 
 
     // Http server
@@ -41,6 +42,7 @@ class Server {
     this.app.use( this.procesosPath, validarJWT, require( '../routes/procesos.routes' ) );
     this.app.use( this.mapaPath, validarJWT, require( '../routes/mapa.routes' ) );
     this.app.use( this.ownersPath, validarJWT, require( '../routes/owners.routes' ) );
+    this.app.use( this.fichaPath, validarJWT, require( '../routes/ficha.routes' ) );
 
 
   } 

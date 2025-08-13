@@ -106,19 +106,17 @@ model Diagrama {
 }
 
 model Ficha {
-  id          Int     @id @default(autoincrement())
-  entradas    String?
-  salidas     String?
-  proveedores String?
-  clientes    String?
-  riesgos     String?
-  registros   String?
-  fichaId     Int     @unique
-  proceso     Proceso @relation(fields: [fichaId], references: [id])
+  id          Int           @id @default(autoincrement())
+  inputOutput InputOutput[]
+  riesgos     Riesgo[]
+  registros   Registro[]
+  procesoId     Int           @unique
+  proceso     Proceso       @relation(fields: [procesoId], references: [id])
 }
 
 model Actividad {
   id              Int     @id @default(autoincrement())
+  numOrden        Int?
   nombre          String
   descripcion     String?
   unidadOperativa String?
@@ -142,4 +140,42 @@ model indicador {
 
   procesoId Int
   proceso   Proceso @relation(fields: [procesoId], references: [id])
+}
+
+model InputOutput {
+  id          Int    @id @default(autoincrement())
+  entrada    String
+  salida     String
+  proveedor String
+  cliente    String
+
+  Ficha   Ficha? @relation(fields: [fichaId], references: [id])
+  fichaId Int?
+}
+
+model Riesgo {
+  id           Int     @id @default(autoincrement())
+  denominacion String
+  probabilidad String?
+  impacto      String?
+  planAccion   String?
+  estado       Boolean @default(true)
+
+  ficha   Ficha? @relation(fields: [fichaId], references: [id])
+  fichaId Int?
+}
+
+model Registro {
+  id           Int     @id @default(autoincrement())
+  denominacion String
+  descripcion  String?
+  tipoRegistro  TipoRegistro?
+
+  ficha   Ficha? @relation(fields: [fichaId], references: [id])
+  fichaId Int?
+}
+
+enum TipoRegistro {
+  físico
+  digital
 }
