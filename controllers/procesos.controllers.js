@@ -22,6 +22,9 @@ const listaProcesos = async ( req = request, res = response ) => {
         },
         orderBy: {
           nivel: 'asc'
+        },
+        include: {
+          ficha: true,
         }
       }
     }
@@ -359,10 +362,6 @@ const actualizarDescripcionProceso = async ( req = request, res = response ) => 
 
 
 
-
-
-
-
 const registrarIndicadorProceso = async ( req = request, res = response ) => {
   const { id } = req.params;
   const { iddetalleproceso, idindicador } = req.body;
@@ -552,6 +551,54 @@ const registrarInputOutput = async ( req = request, res = response ) => {
 }
 };
 
+
+const registrarFichaProceso = async ( req = request, res = response ) => {
+
+  const { id } = req.params;
+  
+  try {
+    // Verificar si el proceso existe
+    const procesoExistente = await prisma.proceso.findUnique( {
+      where: { id: Number( id ) }
+    } );
+
+    if ( !procesoExistente ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'Proceso no encontrado'
+      } );
+    }
+
+    if( procesoExistente.ficha ) {
+      return res.status( 400 ).json( {
+        ok: false,
+        msg: 'El proceso ya tiene una ficha registrada',
+        ficha: procesoExistente.ficha
+      } );
+    }
+
+    // Crear ficha para el proceso
+    const fichaCreada = await prisma.ficha.create( {
+      data: {
+        procesoId: Number( id )
+      }
+    } );
+
+    res.json( {
+      ok: true,
+      msg: 'Ficha del proceso registrada',
+      ficha: fichaCreada
+    } );
+    
+  } catch ( error ) {
+    console.error( error );
+    res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al registrar la ficha del proceso'
+    } );
+  }
+}
+
 module.exports = {
   listaProcesos,
   registrarProceso,
@@ -563,7 +610,6 @@ module.exports = {
   registrarIndicadorProceso,
   registrarActividadesProceso,
   registrarInputOutput,
-};
-
-
+  registrarFichaProceso
+}
 

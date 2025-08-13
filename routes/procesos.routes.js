@@ -4,7 +4,7 @@ const fileUpload = require('express-fileupload');
 
 
 
-const { listaProcesos, actualizarProceso, eliminarProceso, registrarProceso, detalleProceso, registrarInputOutput, actualizarDiagrama, listaOwners, actualizarDescripcionProceso, registrarActividadesProceso } = require( '../controllers/procesos.controllers' );
+const { listaProcesos, actualizarProceso, eliminarProceso, registrarProceso, detalleProceso, registrarInputOutput, actualizarDiagrama, registrarFichaProceso, actualizarDescripcionProceso, registrarActividadesProceso } = require( '../controllers/procesos.controllers' );
 const { validarCampos, validarArchivo } = require( '../middlewares/validar-campos' );
 
 
@@ -90,6 +90,12 @@ router.post( '/:id/registrar-input-output', [
  
   validarCampos
 ], registrarInputOutput );
+
+
+router.get( '/:id/registrar-ficha', [
+
+  validarCampos
+], registrarFichaProceso );
 
 //
 
