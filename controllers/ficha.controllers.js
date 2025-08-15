@@ -41,8 +41,6 @@ const byIdRegistrarInputOutput = async ( req = request, res = response ) => {
   const { id } = req.params;
   const { inputOutput } = req.body;
 
-  console.log("inicio del registro de Input/Output")
-
   try {
     // 1. Obtener todos los registros actuales de la ficha
     const existentes = await prisma.inputOutput.findMany( {
