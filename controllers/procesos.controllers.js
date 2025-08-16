@@ -483,7 +483,7 @@ const registrarActividadesProceso = async ( req = request, res = response ) => {
 };
 
 const registrarInputOutput = async ( req = request, res = response ) => {
-  
+
   const { id } = req.params;
   const { inputOutput } = req.body;
 
@@ -536,26 +536,26 @@ const registrarInputOutput = async ( req = request, res = response ) => {
       } )
     );
 
-  res.json( {
-    ok: true,
-    msg: 'Input/Output registrado',
-    nuevosInputOutput
-  } );
+    res.json( {
+      ok: true,
+      msg: 'Input/Output registrado',
+      nuevosInputOutput
+    } );
 
-} catch ( error ) {
-  console.error( error );
-  res.status( 500 ).json( {
-    ok: false,
-    msg: 'Error al registrar el Input/Output del proceso'
-  } );
-}
+  } catch ( error ) {
+    console.error( error );
+    res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al registrar el Input/Output del proceso'
+    } );
+  }
 };
 
 
 const registrarFichaProceso = async ( req = request, res = response ) => {
 
   const { id } = req.params;
-  
+
   try {
     // Verificar si el proceso existe
     const procesoExistente = await prisma.proceso.findUnique( {
@@ -569,7 +569,7 @@ const registrarFichaProceso = async ( req = request, res = response ) => {
       } );
     }
 
-    if( procesoExistente.ficha ) {
+    if ( procesoExistente.ficha ) {
       return res.status( 400 ).json( {
         ok: false,
         msg: 'El proceso ya tiene una ficha registrada',
@@ -589,7 +589,7 @@ const registrarFichaProceso = async ( req = request, res = response ) => {
       msg: 'Ficha del proceso registrada',
       ficha: fichaCreada
     } );
-    
+
   } catch ( error ) {
     console.error( error );
     res.status( 500 ).json( {
@@ -597,7 +597,59 @@ const registrarFichaProceso = async ( req = request, res = response ) => {
       msg: 'Error al registrar la ficha del proceso'
     } );
   }
-}
+};
+
+const obtenerImagenDiagrama64 = async ( req = request, res = response ) => {
+
+  const { id } = req.params;
+
+  try {
+    // Verificar si el proceso existe
+    const procesoExistente = await prisma.proceso.findUnique( {
+      where: { id: Number( id ) }
+    } );
+
+    if ( !procesoExistente ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'Proceso no encontrado'
+      } );
+    }
+
+
+    const imagenDiagrama = await prisma.diagrama.findUnique( {
+      where: { procesoId: Number( id ) },
+
+    } );
+
+    if ( !imagenDiagrama ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'Diagrama no encontrado'
+      } );
+    }
+    // Obtener la imagen del diagrama en base64
+    const imagePath = path.join( __dirname, `../public/diagrama-${procesoExistente.codigo}.png` );
+    
+    const image = await fs.readFile(imagePath);
+    
+    const base64 = Buffer.from(image).toString('base64');
+    
+
+    res.json( {
+      ok: true,
+      msg: 'Diagrama obtenido',
+      base64: `data:image/png;base64,${base64}` 
+    } );
+
+  } catch ( error ) {
+    console.error( error );
+    res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al obtener la imagen del diagrama'
+    } );
+  }
+};
 
 module.exports = {
   listaProcesos,
@@ -610,6 +662,7 @@ module.exports = {
   registrarIndicadorProceso,
   registrarActividadesProceso,
   registrarInputOutput,
-  registrarFichaProceso
+  registrarFichaProceso,
+  obtenerImagenDiagrama64
 }
 

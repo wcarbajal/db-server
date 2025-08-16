@@ -4,7 +4,7 @@ const fileUpload = require('express-fileupload');
 
 
 
-const { listaProcesos, actualizarProceso, eliminarProceso, registrarProceso, detalleProceso, registrarInputOutput, actualizarDiagrama, registrarFichaProceso, actualizarDescripcionProceso, registrarActividadesProceso } = require( '../controllers/procesos.controllers' );
+const { listaProcesos, actualizarProceso, eliminarProceso, registrarProceso, detalleProceso, registrarInputOutput, actualizarDiagrama, registrarFichaProceso, actualizarDescripcionProceso, registrarActividadesProceso, obtenerImagenDiagrama64 } = require( '../controllers/procesos.controllers' );
 const { validarCampos, validarArchivo } = require( '../middlewares/validar-campos' );
 
 
@@ -97,6 +97,9 @@ router.get( '/:id/registrar-ficha', [
   validarCampos
 ], registrarFichaProceso );
 
-//
+router.get('/:id/imagen-diagrama-64', [
+
+  validarCampos
+], obtenerImagenDiagrama64 );
 
 module.exports = router;
