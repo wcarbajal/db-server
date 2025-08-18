@@ -216,7 +216,7 @@ const listarProcesosNivelCero = async ( req = request, res = response ) => {
     } );
 
 
-    
+
     //const procesos = procesosNivel0.length > 0 ? procesosNivel0[0].procesos : [];
 
     if ( !procesosNivel0 || procesosNivel0.length === 0 ) {
@@ -324,11 +324,11 @@ const infoCantidades = async ( req = request, res = response ) => {
       }
     } );
 
-   /*  const reportesCount = await prisma.reporte.count( {
-      where: {
-        estado: true
-      }
-    } ); */
+    /*  const reportesCount = await prisma.reporte.count( {
+       where: {
+         estado: true
+       }
+     } ); */
 
     res.json( {
       ok: true,
@@ -350,6 +350,116 @@ const infoCantidades = async ( req = request, res = response ) => {
   }
 };
 
+const obtenerDataChart = async ( req = request, res = response ) => {
+
+  const { id } = req.params;
+
+  try {
+    // Verificar si el proceso existe
+    const procesoExistente = await prisma.proceso.findMany( {
+      where: { mapaId: Number( id ) }
+    } );
+
+    if ( !procesoExistente || procesoExistente.length === 0 ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'Proceso no encontrado'
+      } );
+    }
+
+    // 1. Procesos por tipo
+    const procesosPorTipo = await prisma.proceso.groupBy( {
+      where: { estado: true, mapaId: Number( id ) },
+      by: [ 'tipo' ],
+      _count: { tipo: true },
+    } );
+
+    const resumenPorTipo = procesosPorTipo.map( item => ( {
+      tipo: item.tipo,
+      cantidad: item._count.tipo
+    } ) );
+
+
+    // version con map, pero Promise.all, dao que no se puede usar .map con await dentro de un callback, map no espera las promesas
+    /*  const listadoPorTipo = {};
+     await Promise.all(
+       procesosPorTipo.map( async ( tipoObj ) => {
+         const tipo = tipoObj.tipo;
+         listadoPorTipo[ tipo ] = await prisma.proceso.findMany( {
+           where: { tipo, estado: true },
+           select: { id: true, codigo: true, nombre: true, tipo: true }
+         } );
+       } )
+     ); */
+
+    // 2. Procesos por nivel
+    const procesosPorNivel = await prisma.proceso.groupBy( {
+      where: { estado: true, mapaId: Number( id ) },
+      by: [ 'nivel' ],
+      _count: { nivel: true },
+    } );
+
+    const resumenPorNivel = procesosPorNivel.map( item => ( {
+      nivel: item.nivel,
+      cantidad: item._count.nivel
+    } ) );
+
+    /*  const listadoPorNivel = {};
+     for ( const nivelObj of procesosPorNivel ) {
+       const nivel = nivelObj.nivel;
+       listadoPorNivel[ nivel ] = await prisma.proceso.findMany( {
+         where: { nivel, estado: true },
+         select: { id: true, codigo: true, nombre: true, nivel: true }
+       } );
+     } */
+
+    // 3. Procesos por responsables
+    const responsables = await prisma.owner.findMany( {
+      include: {
+        procesos: {
+          where: { estado: true, mapaId: Number( id ) },
+          select: { id: true, codigo: true, nombre: true }
+        }
+      }
+    } );
+    
+    const resumenResponsables = responsables.map( r => ( {
+      responsable: r.nombre,
+      cantidad: r.procesos.length,
+      procesos: r.procesos
+    } ) );
+
+    // 4. Procesos por owners
+    /*  const owners = await prisma.owner.findMany( {
+       include: {
+         procesos: {
+           where: { estado: true },
+           select: { id: true, codigo: true, nombre: true }
+         }
+       }
+     } );
+ 
+     const resumenOwners = owners.map( o => ( {
+       owner: o.nombre,
+       cantidad: o.procesos.length,
+       procesos: o.procesos
+     } ) ); */
+
+    res.json( {
+      ok: true,
+      msg: "Resumen de procesos",
+      porTipo: resumenPorTipo,
+      porNivel: resumenPorNivel,     
+    } );
+  } catch ( error ) {
+    console.error( error );
+    res.status( 500 ).json( {
+      ok: false,
+      msg: "Error al obtener el resumen de procesos"
+    } );
+  }
+};
+
 module.exports = {
   listarMapa,
   registrarMapa,
@@ -357,5 +467,6 @@ module.exports = {
   actualizarMapa,
   listarProcesosNivelCero,
   listarProcesos,
-  infoCantidades
+  infoCantidades,
+  obtenerDataChart
 };

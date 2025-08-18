@@ -651,6 +651,8 @@ const obtenerImagenDiagrama64 = async ( req = request, res = response ) => {
   }
 };
 
+
+
 module.exports = {
   listaProcesos,
   registrarProceso,
@@ -663,6 +665,7 @@ module.exports = {
   registrarActividadesProceso,
   registrarInputOutput,
   registrarFichaProceso,
-  obtenerImagenDiagrama64
+  obtenerImagenDiagrama64,
+  
 }
 

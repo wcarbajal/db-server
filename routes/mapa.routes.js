@@ -1,7 +1,16 @@
 const { Router } = require( 'express' );
 const {  check } = require( 'express-validator' );
 const { validarCampos } = require( '../middlewares/validar-campos' );
-const { listarMapa, listarProcesos, registrarMapa, eliminarMapa, actualizarMapa, listarProcesosNivelCero, infoCantidades } = require( '../controllers/mapa.controllers' );
+const { 
+  listarMapa, 
+  listarProcesos, 
+  registrarMapa, 
+  eliminarMapa, 
+  actualizarMapa, 
+  listarProcesosNivelCero, 
+  infoCantidades,
+  obtenerDataChart
+} = require( '../controllers/mapa.controllers' );
 
 
 const router = Router();
@@ -21,8 +30,6 @@ router.get( '/:id/procesos-lista', [
 router.get( '/cantidades', [  
   validarCampos
 ], infoCantidades );  
-
-
 
 router.post( '/registrar', [
   check( 'ruc', 'RUC es obligatorio' ).isString().notEmpty(),
@@ -52,5 +59,9 @@ router.put( '/actualizar/:id', [
 router.delete( '/eliminar/:id', [
   validarCampos
 ], eliminarMapa );
+
+router.get( '/:id/data-chart', [
+  validarCampos
+], obtenerDataChart );
 
 module.exports = router;
