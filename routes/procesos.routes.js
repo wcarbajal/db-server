@@ -14,7 +14,8 @@ const {
   actualizarDescripcionProceso,
   registrarActividadesProceso,
   obtenerImagenDiagrama64,
-  obtenerDataChart
+  obtenerDataChart,
+  registrarDiagramaProceso
 } = require( '../controllers/procesos.controllers' );
 const { validarCampos, validarArchivo } = require( '../middlewares/validar-campos' );
 
@@ -107,6 +108,12 @@ router.get( '/:id/registrar-ficha', [
 
   validarCampos
 ], registrarFichaProceso );
+
+router.post( '/:id/registrar-diagrama', [
+
+  validarCampos
+], registrarDiagramaProceso );
+
 
 router.get('/:id/imagen-diagrama-64', [
 

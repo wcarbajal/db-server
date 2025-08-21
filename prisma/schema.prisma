@@ -99,6 +99,7 @@ model Proceso {
 model Diagrama {
   id            Int      @id @default(autoincrement())
   url           String
+  xml           String? 
   creadoEn      DateTime @default(now())
   actualizadoEn DateTime @updatedAt
   procesoId     Int      @unique

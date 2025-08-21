@@ -629,17 +629,17 @@ const obtenerImagenDiagrama64 = async ( req = request, res = response ) => {
       } );
     }
     // Obtener la imagen del diagrama en base64
-    const imagePath = path.join( __dirname, `../public/diagrama-${procesoExistente.codigo}.png` );
-    
-    const image = await fs.readFile(imagePath);
-    
-    const base64 = Buffer.from(image).toString('base64');
-    
+    const imagePath = path.join( __dirname, `../public/diagrama-${ procesoExistente.codigo }.png` );
+
+    const image = await fs.readFile( imagePath );
+
+    const base64 = Buffer.from( image ).toString( 'base64' );
+
 
     res.json( {
       ok: true,
       msg: 'Diagrama obtenido',
-      base64: `data:image/png;base64,${base64}` 
+      base64: `data:image/png;base64,${ base64 }`
     } );
 
   } catch ( error ) {
@@ -647,6 +647,65 @@ const obtenerImagenDiagrama64 = async ( req = request, res = response ) => {
     res.status( 500 ).json( {
       ok: false,
       msg: 'Error al obtener la imagen del diagrama'
+    } );
+  }
+};
+
+const registrarDiagramaProceso = async ( req = request, res = response ) => {
+  const { id } = req.params;
+  const { xml } = req.body;
+  
+
+
+  try {
+    // Verificar si el proceso existe
+    const procesoExistente = await prisma.proceso.findUnique( {
+      where: { id: Number( id ) }
+    } );
+
+    if ( !procesoExistente ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'Proceso no encontrado'
+      } );
+    }
+
+    // verificar si existe el xml
+    const diagramaExistente = await prisma.diagrama.findUnique( {
+      where: { procesoId: Number( id ) }
+    } );
+    
+    let xmlRegistro;
+
+    if ( !diagramaExistente ) {
+      xmlRegistro = await prisma.diagrama.create( {        
+        data: {
+          procesoId: Number( id ),
+          xml,
+          url: 'no definido',
+        }
+      } );
+    }else{
+      xmlRegistro = await prisma.diagrama.update( {
+        where: { procesoId: Number( id ) },
+        data: {
+          xml,
+          url: 'no definido',
+        }
+      } );
+    }
+
+    res.json( {
+      ok: true,
+      msg: 'Diagrama del proceso registrado',
+      diagrama: xmlRegistro.xml
+    } );
+
+  } catch ( error ) {
+    console.error( error );
+    res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al registrar el diagrama del proceso'
     } );
   }
 };
@@ -666,6 +725,7 @@ module.exports = {
   registrarInputOutput,
   registrarFichaProceso,
   obtenerImagenDiagrama64,
-  
+  registrarDiagramaProceso
+
 }
 
