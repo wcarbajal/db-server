@@ -263,13 +263,10 @@ const listarProcesos = async ( req = request, res = response ) => {
       } );
     }
 
-    const procesosList = await prisma.mapa.findMany( {
+    const procesosList = await prisma.proceso.findMany( {
       where: {
-        id: parseInt( id ),
+        mapaId: parseInt( id ),
         estado: true
-      },
-      select: {
-        procesos: true
       }
     } );
 
@@ -281,11 +278,11 @@ const listarProcesos = async ( req = request, res = response ) => {
         procesos: []
       } );
     }
-    const procesos = procesosList[ 0 ].procesos;
+    
     res.status( 200 ).json( {
       ok: true,
       msg: 'Lista de procesos asociados al mapa',
-      procesos
+      procesos: procesosList
     } );
 
   } catch ( error ) {
