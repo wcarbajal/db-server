@@ -57,7 +57,7 @@ router.post( '/:idMapa/registrar', [
 
 
 //actualizar un proceos en modo admin
-router.put( '/:id', [
+router.put( '/:id/actualizar', [
   check( 'id', 'El ID del proceso es obligatorio' ).not().isEmpty(),
   check( 'id', 'El ID debe ser un número entero' ).isInt(),
   check( 'codigo', 'El código es obligatorio' ).optional().not().isEmpty(),

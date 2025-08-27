@@ -71,7 +71,9 @@ model Mapa {
 
 model Proceso {
   id            Int         @id @default(autoincrement())
-  codigo        String      @unique
+  codigo        String
+  version       Int
+  vigente       Boolean    @default(true)
   nombre        String
   tipo          TipoProceso
   nivel         Int
@@ -94,12 +96,14 @@ model Proceso {
   indicadores indicador[]
   mapa        Mapa?       @relation(fields: [mapaId], references: [id])
   mapaId      Int?
+
+  @@unique([codigo, version]) 
 }
 
 model Diagrama {
   id            Int      @id @default(autoincrement())
   url           String
-  xml           String? 
+  xml           String?
   creadoEn      DateTime @default(now())
   actualizadoEn DateTime @updatedAt
   procesoId     Int      @unique
@@ -111,7 +115,7 @@ model Ficha {
   inputOutput InputOutput[]
   riesgos     Riesgo[]
   registros   Registro[]
-  procesoId     Int           @unique
+  procesoId   Int           @unique
   proceso     Proceso       @relation(fields: [procesoId], references: [id])
 }
 
@@ -144,11 +148,11 @@ model indicador {
 }
 
 model InputOutput {
-  id          Int    @id @default(autoincrement())
-  entrada    String
-  salida     String
+  id        Int    @id @default(autoincrement())
+  entrada   String
+  salida    String
   proveedor String
-  cliente    String
+  cliente   String
 
   Ficha   Ficha? @relation(fields: [fichaId], references: [id])
   fichaId Int?
@@ -167,10 +171,10 @@ model Riesgo {
 }
 
 model Registro {
-  id           Int     @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   denominacion String
   descripcion  String?
-  tipoRegistro  TipoRegistro?
+  tipoRegistro TipoRegistro?
 
   ficha   Ficha? @relation(fields: [fichaId], references: [id])
   fichaId Int?

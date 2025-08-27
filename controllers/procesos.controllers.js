@@ -2,6 +2,8 @@ const fs = require( 'fs/promises' );
 const { PrismaClient } = require( '@prisma/client' );
 const { request, response } = require( 'express' );
 const path = require( 'path' );
+const e = require( 'express' );
+const { version } = require( 'os' );
 
 const prisma = new PrismaClient();
 
@@ -51,49 +53,55 @@ const registrarProceso = async ( req = request, res = response ) => {
 
   const { idMapa } = req.params;
 
-  const { codigo, tipo, nivel, nombre, descripcion, parentId } = req.body;
+  const {
+    codigo,
+    descripcion,
+    nivel,
+    nombre,
+    parentId,
+    tipo
+  } = req.body;
 
   try {
     // Verificar si el código ya existe
 
-    const existeCodigo = await prisma.mapa.findUnique( {
-      where: { id: Number( idMapa ) },
-      select: {
-        procesos: {
-          where: {
-            codigo,
-            estado: true
-          }
-        }
+    const existeProceso = await prisma.proceso.findFirst( {
+      where: {
+        AND: [
+          { codigo },
+          { estado: true },
+          { mapaId: Number( idMapa ) }
+        ]
       }
     } );
-    // Si el código ya existe, retornar un error
-    if ( existeCodigo && existeCodigo.procesos.length > 0 ) {
+    if ( existeProceso ) {
       return res.status( 400 ).json( {
         ok: false,
-        msg: 'El código ya se encuentra registrado',
-        proceso: []
+        msg: 'El proceso ya se encuentra registrado',
+        proceso: existeProceso
       } );
     }
 
-    const data = {
-      codigo,
-      nombre,
-      tipo,
-      nivel: +nivel,
-      descripcion,
-      mapa: {
-        connect: { id: Number( idMapa ) }
-      }
-    };
+     const data = {
+       codigo,
+       nombre,
+       tipo,
+       nivel: +nivel,
+       descripcion,
+       version: 1,
+       mapa: {
+         connect: { id: Number( idMapa ) }
+       }
+     };
+ 
+     if ( parentId ) {
+       data.parent = {
+         connect: { id: Number( parentId ) }
+       };
+     }
+ 
+     const nuevoProceso = await prisma.proceso.create( { data } );
 
-    if ( parentId ) {
-      data.parent = {
-        connect: { id: Number( parentId ) }
-      };
-    }
-
-    const nuevoProceso = await prisma.proceso.create( { data } );
 
     res.status( 201 ).json( {
       ok: true,
@@ -112,7 +120,18 @@ const registrarProceso = async ( req = request, res = response ) => {
 const actualizarProceso = async ( req = request, res = response ) => {
   const { id } = req.params;
 
-  const { codigo, tipo, nivel, nombre, descripcion, parentId, owners, objetivo, estrategico, alcance } = req.body;
+  const {
+    codigo,
+    descripcion,
+    idMapa,
+    nivel,
+    nombre,
+    parentId,
+    tipo,
+    owners,
+    objetivo,
+    estrategico,
+    alcance } = req.body;
 
 
   try {
@@ -654,7 +673,7 @@ const obtenerImagenDiagrama64 = async ( req = request, res = response ) => {
 const registrarDiagramaProceso = async ( req = request, res = response ) => {
   const { id } = req.params;
   const { xml } = req.body;
-  
+
 
 
   try {
@@ -674,18 +693,18 @@ const registrarDiagramaProceso = async ( req = request, res = response ) => {
     const diagramaExistente = await prisma.diagrama.findUnique( {
       where: { procesoId: Number( id ) }
     } );
-    
+
     let xmlRegistro;
 
     if ( !diagramaExistente ) {
-      xmlRegistro = await prisma.diagrama.create( {        
+      xmlRegistro = await prisma.diagrama.create( {
         data: {
           procesoId: Number( id ),
           xml,
           url: 'no definido',
         }
       } );
-    }else{
+    } else {
       xmlRegistro = await prisma.diagrama.update( {
         where: { procesoId: Number( id ) },
         data: {
