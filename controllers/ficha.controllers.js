@@ -39,12 +39,18 @@ const getInputOutputById = async ( req = request, res = response ) => {
 const byIdRegistrarInputOutput = async ( req = request, res = response ) => {
 
   const { id } = req.params;
+  const fichaId = Number( id );
   const { inputOutput } = req.body;
 
   try {
+
+    const ficha = await prisma.ficha.findUnique( { where: { id: fichaId } } );
+    if ( !ficha ) {
+      return res.status( 404 ).json( { ok: false, msg: 'Ficha no encontrada' } );
+    }
     // 1. Obtener todos los registros actuales de la ficha
     const existentes = await prisma.inputOutput.findMany( {
-      where: { fichaId: Number( id ) },
+      where: { fichaId: Number( fichaId ) },
     } );
 
     // 2. Crear un Set de proveedores recibidos para fácil comparación
@@ -67,6 +73,7 @@ const byIdRegistrarInputOutput = async ( req = request, res = response ) => {
         await prisma.inputOutput.update( {
           where: { id: existente.id },
           data: {
+            fichaId,
             entrada: item.entrada,
             salida: item.salida,
             cliente: item.cliente,
@@ -74,9 +81,10 @@ const byIdRegistrarInputOutput = async ( req = request, res = response ) => {
           },
         } );
       } else {
+
         await prisma.inputOutput.create( {
           data: {
-            fichaId: Number( id ),
+            fichaId,
             proveedor: item.proveedor,
             entrada: item.entrada,
             salida: item.salida,
@@ -88,7 +96,7 @@ const byIdRegistrarInputOutput = async ( req = request, res = response ) => {
 
     // 5. Obtener el estado final actualizado
     const result = await prisma.inputOutput.findMany( {
-      where: { fichaId: Number( id ) },
+      where: { fichaId: Number( fichaId ) },
     } );
 
     res.json( {

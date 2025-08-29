@@ -17,6 +17,8 @@ router.get( '/:id/input-output', [
   validarCampos
 ], getInputOutputById );
 
+
+
 router.post( '/:id/registrar-io', [ 
   validarCampos
 ], byIdRegistrarInputOutput );
