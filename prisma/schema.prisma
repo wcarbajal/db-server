@@ -121,11 +121,12 @@ model Ficha {
 
 model Actividad {
   id              Int     @id @default(autoincrement())
-  numOrden        Int?
   nombre          String
+  numOrden        Int?
   descripcion     String?
   unidadOperativa String?
   responsable     String
+  registro        String?
   procesoId       Int
   proceso         Proceso @relation(fields: [procesoId], references: [id])
 }
@@ -179,6 +180,7 @@ model Registro {
   ficha   Ficha? @relation(fields: [fichaId], references: [id])
   fichaId Int?
 }
+
 
 enum TipoRegistro {
   físico
