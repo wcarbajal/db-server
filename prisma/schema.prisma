@@ -1,4 +1,4 @@
-// This is your Prisma schema file,
+ // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
@@ -41,13 +41,17 @@ model Usuario {
 
 model Owner {
   id       Int     @id @default(autoincrement())
-  oficina  String
-  siglas   String
   director String
   correo   String
   estado   Boolean @default(true)
 
   procesos Proceso[] @relation("ProcesoOwners")
+
+  unidadOperativa   UnidadOperativa @relation(fields: [unidadOperativaId], references: [id])
+  unidadOperativaId Int
+
+  mapa   Mapa @relation(fields: [mapaId], references: [id])
+  mapaId Int
 }
 
 enum TipoProceso {
@@ -57,23 +61,25 @@ enum TipoProceso {
 }
 
 model Mapa {
-  id            Int       @id @default(autoincrement())
-  nombre        String    @unique
-  ruc           String    @unique
-  descripcion   String?
-  entrada       String?
-  salida        String?
-  creadoEn      DateTime  @default(now())
-  actualizadoEn DateTime  @updatedAt
-  estado        Boolean   @default(true)
-  procesos      Proceso[]
+  id              Int               @id @default(autoincrement())
+  nombre          String            @unique
+  ruc             String            @unique
+  descripcion     String?
+  entrada         String?
+  salida          String?
+  creadoEn        DateTime          @default(now())
+  actualizadoEn   DateTime          @updatedAt
+  estado          Boolean           @default(true)
+  procesos        Proceso[]
+  Owner           Owner[]
+  UnidadOperativa UnidadOperativa[]
 }
 
 model Proceso {
   id            Int         @id @default(autoincrement())
   codigo        String
   version       Int
-  vigente       Boolean    @default(true)
+  vigente       Boolean     @default(true)
   nombre        String
   tipo          TipoProceso
   nivel         Int
@@ -94,10 +100,10 @@ model Proceso {
   ficha       Ficha?
   actividades Actividad[]
   indicadores indicador[]
-  mapa        Mapa?       @relation(fields: [mapaId], references: [id])
-  mapaId      Int?
+  mapa        Mapa        @relation(fields: [mapaId], references: [id])
+  mapaId      Int
 
-  @@unique([codigo, version]) 
+  @@unique([codigo, version])
 }
 
 model Diagrama {
@@ -181,6 +187,16 @@ model Registro {
   fichaId Int?
 }
 
+model UnidadOperativa {
+  id     Int     @id @default(autoincrement())
+  nombre String
+  siglas String
+  estado Boolean @default(true)
+  mapa   Mapa    @relation(fields: [mapaId], references: [id])
+  mapaId Int
+
+  Owner Owner[]
+}
 
 enum TipoRegistro {
   físico

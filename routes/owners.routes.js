@@ -9,7 +9,7 @@ const { validarCampos } = require( '../middlewares/validar-campos' );
 const router = Router();
 
 
-router.get( '/', [
+router.get( '/:mapaId', [
 
   validarCampos
 ], listaOwners );

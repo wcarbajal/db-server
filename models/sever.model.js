@@ -19,6 +19,8 @@ class Server {
     this.mapaPath = '/api/mapa';
     this.ownersPath = '/api/owners';
     this.fichaPath = '/api/ficha';
+    this.unidadOperativaPath = '/api/unidad-operativa';
+    this.usuarioPath = '/api/usuario';
 
 
     // Http server
@@ -43,6 +45,8 @@ class Server {
     this.app.use( this.mapaPath, validarJWT, require( '../routes/mapa.routes' ) );
     this.app.use( this.ownersPath, validarJWT, require( '../routes/owners.routes' ) );
     this.app.use( this.fichaPath, validarJWT, require( '../routes/ficha.routes' ) );
+    this.app.use( this.unidadOperativaPath, validarJWT, require( '../routes/unidad-operativa.routes.js' ) );
+    this.app.use( this.usuarioPath, validarJWT, require( '../routes/usuario.routes.js' ) );
 
 
   } 

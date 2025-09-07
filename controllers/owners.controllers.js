@@ -9,11 +9,17 @@ const prisma = new PrismaClient();
  * @returns {Promise<void>} Respuesta JSON con la lista de dueños o un error.
  */
 const listaOwners = async ( req = request, res = response ) => {
+
+  const { mapaId } = req.params;
+
   try {
     const owners = await prisma.owner.findMany( {
-      where: { estado: true },
+      where: { estado: true, mapaId: Number( mapaId ) },
       orderBy: {
         id: 'asc'
+      },
+      include: {
+        unidadOperativa: true
       }
     } );
 
@@ -41,33 +47,34 @@ const listaOwners = async ( req = request, res = response ) => {
 
 const registrarOwner = async ( req = request, res = response ) => {
 
-  const { oficina, siglas, director, correo } = req.body;
+  const { oficina, director, correo, mapaId } = req.body;
 
   try {
 
     // verificar si el owner ya existe
     const existingOwner = await prisma.owner.findMany( {
       where: {
-        OR: [
-          { oficina: oficina },
-          { siglas: siglas }
-        ]
+        AND:[
+          {mapaId: Number( mapaId ) },          
+          { unidadOperativaId: Number( oficina ) },
+          {estado: true}
+        ],
       }
     } );
 
     if ( existingOwner.length > 0 ) {
-      return res.status( 400 ).json( {
+      return res.status( 400 ).json( {  
         ok: false,
-        msg: 'Ya existe un Dueño con ese oficina o sigla'
+        msg: 'Ya existe un Dueño con ese oficina para la entidad'
       } );
     }
 
     const nuevoOwner = await prisma.owner.create( {
-      data: {
-        oficina,
-        siglas,
-        director,
-        correo
+      data: {        
+        director: director,
+        correo: correo,
+        mapaId: Number(mapaId),
+        unidadOperativaId: Number(oficina)
       }
     } );
 
@@ -90,8 +97,13 @@ const eliminarOwner = async ( req, res ) => {
   const { id } = req.params;
 
   try {
-    const owner = await prisma.owner.findUnique( {
-      where: { id: Number( id ) }
+    const owner = await prisma.owner.findMany( {
+      where: {
+        AND: [
+          { id: Number( id ) },
+          { estado: true }
+        ]
+      }
     } );
 
     if ( !owner ) {
@@ -105,6 +117,11 @@ const eliminarOwner = async ( req, res ) => {
       data: { estado: false }
     } );
 
+    res.json( {
+      ok: true,
+      msg: 'Owner eliminado exitosamente',      
+    } );
+
   } catch ( error ) {
     console.log( error );
     res.status( 500 ).json( { msg: 'Error al eliminar owner' } );
@@ -114,7 +131,7 @@ const eliminarOwner = async ( req, res ) => {
 const actualizarOwner = async ( req, res ) => {
 
   const { id } = req.params;
-  const { oficina, siglas, director, correo } = req.body;
+  const { oficina, mapaId, director, correo } = req.body;
 
   try {
 
@@ -132,23 +149,23 @@ const actualizarOwner = async ( req, res ) => {
 
     // buscar en el resto de registros si ya existe un owner con la misma oficina o siglas
     const existingOwner = await prisma.owner.findMany( {
-      where: {
-        OR: [
-          { oficina: oficina },
-          { siglas: siglas }
-        ]
-      }
+      where: { 
+      AND:[
+        {unidadOperativaId: Number(oficina) },
+        {estado: true },
+        { mapaId: Number(mapaId) }
+      ]
+       }
     } );
-    if ( existingOwner.length > 0 && existingOwner[ 0 ].id !== Number( id ) ) {
-      return res.status( 400 ).json( { ok: false, msg: 'Ya existe un owner con esa oficina o siglas' } );
+    if ( existingOwner.length > 1 || ( existingOwner.length === 1 && existingOwner[0].id !== owner.id ) ) {
+      return res.status( 400 ).json( { ok: false, msg: 'Ya existe un owner con esa oficina o Dirección' } );
     }
 
 
     const updatedOwner = await prisma.owner.update( {
       where: { id: Number( id ) },
       data: {
-        oficina: oficina || owner.oficina,
-        siglas: siglas || owner.siglas,
+        unidadOperativaId: Number(oficina) || owner.unidadOperativaId,        
         director: director || owner.director,
         correo: correo || owner.correo
       }

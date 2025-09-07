@@ -321,6 +321,12 @@ const infoCantidades = async ( req = request, res = response ) => {
       }
     } );
 
+     const unidadesFuncionalesCount = await prisma.unidadOperativa.count( {
+      where: {
+        estado: true
+      }
+    } );
+
     /*  const reportesCount = await prisma.reporte.count( {
        where: {
          estado: true
@@ -334,6 +340,7 @@ const infoCantidades = async ( req = request, res = response ) => {
       procesos: procesosCount === null ? 0 : procesosCount,
       owners: ownersCount === null ? 0 : ownersCount,
       usuarios: usuariosCount === null ? 0 : usuariosCount,
+      unidadesFuncionales: unidadesFuncionalesCount === null ? 0 : unidadesFuncionalesCount,
       reportes: 0
 
     } );
