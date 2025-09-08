@@ -37,6 +37,9 @@ model Usuario {
   online              Boolean?  @default(false)
   rolesId             Int
   procesosResponsable Proceso[] @relation("ProcesoResponsables")
+
+  mapas               Mapa[]    @relation("UsuarioMapas") // <--- Relación muchos a muchos
+  
 }
 
 model Owner {
@@ -73,6 +76,8 @@ model Mapa {
   procesos        Proceso[]
   Owner           Owner[]
   UnidadOperativa UnidadOperativa[]
+
+   usuarios        Usuario[]         @relation("UsuarioMapas") // <--- Relación muchos a muchos
 }
 
 model Proceso {

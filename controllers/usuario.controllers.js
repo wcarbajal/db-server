@@ -9,12 +9,26 @@ const getUsuarios = async ( req = request, res = response ) => {
   const { mapaId } = req.params;
 
   try {
+    // buscar los usuarios que tengan asignado n-mapas
+
     const usuarios = await prisma.usuario.findMany( {
       where: {
         estado: true,
-        mapaId: Number( mapaId )
+        mapas: {
+          some: {
+            id: Number(mapaId)
+          }
+        }
+      },
+      omit: {
+        password: true
+      },
+      include:{
+        
+        rol: true
       }
     } );
+
 
     // verificar que hayan usuarios
     if ( !usuarios || usuarios.length === 0 ) {
