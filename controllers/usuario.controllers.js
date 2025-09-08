@@ -23,11 +23,12 @@ const getUsuarios = async ( req = request, res = response ) => {
       omit: {
         password: true
       },
-      include:{
-        
-        rol: true
+      include:{        
+        rol: true,
+        mapas: true
       }
     } );
+    
 
 
     // verificar que hayan usuarios

@@ -18,7 +18,7 @@ class Sockets {
 
       const [ valido, id ] = comprobarJWT( socket.handshake.query[ 'x-token' ] );
 
-      console.log( {valido}, {id} );
+      
       
       if ( !valido ) {
         console.log( 'socket no identificado' );
@@ -27,7 +27,7 @@ class Sockets {
 
      const userConect = await usuarioConectado( id );
 
-     console.log(userConect);
+     
 
 
     } );

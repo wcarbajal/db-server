@@ -33,7 +33,7 @@ return usuario;
   })
   const { password: _password, ...usuario } = usuarioDB;
   
-  console.log("usuario desconectado", usuario);
+  
 
 return usuario;
 

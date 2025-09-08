@@ -16,7 +16,7 @@ const validarCampos = ( req, res, next) => {
 
 const validarArchivo = (req = request, res = response, next) => {
 
-  console.log("request", req);
+  
   if (!req.file || !req.file.diagrama) {
     return res.status(400).json({
       ok: false,

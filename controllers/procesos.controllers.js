@@ -270,7 +270,7 @@ const actualizarDiagrama = async ( req = request, res = response ) => {
   const file = req.files?.diagrama;
 
   if ( !file ) return res.status( 400 ).json( { ok: false, msg: 'No se subió archivo 400' } );
-  console.log( "file", file );
+  
 
   try {
 
@@ -279,7 +279,7 @@ const actualizarDiagrama = async ( req = request, res = response ) => {
       where: { id: Number( id ) }
     } );
 
-    console.log( "procesoExistente", procesoExistente );
+    
 
     if ( !procesoExistente ) {
       return res.status( 404 ).json( {
@@ -291,13 +291,13 @@ const actualizarDiagrama = async ( req = request, res = response ) => {
     //uploadPath debe apuntar a la carpeta public
 
     const uploadPath = path.join( __dirname, '../public', `diagrama-${ procesoExistente.codigo }.png` );
-    console.log( "uploadPath", uploadPath );
+    
     await file.mv( uploadPath );
 
     const url = `/diagrama-${ procesoExistente.codigo }.png`;
     const fullUrl = req.protocol + '://' + req.get( 'host' ) + url;
 
-    console.log( "fullUrl", fullUrl );
+    
 
 
     await prisma.proceso.update( {
@@ -423,8 +423,7 @@ const registrarActividadesProceso = async ( req = request, res = response ) => {
   const { id } = req.params;
   const { actividades } = req.body;
 
-  console.log( "Actividades recibidas:", actividades );
-
+  
   try {
     // Verificar si el proceso existe
     const procesoExistente = await prisma.proceso.findUnique( {
@@ -438,18 +437,18 @@ const registrarActividadesProceso = async ( req = request, res = response ) => {
         msg: 'Proceso no encontrado'
       } );
     }
-    console.log( "el proceso existe" );
+    
 
     let maxNumOrden = await prisma.actividad.aggregate( {
       where: { procesoId: Number( id ) },
       _max: { numOrden: true }
     } );
 
-    console.log( { maxNumOrden } );
+    
 
     let siguienteNumOrden = ( maxNumOrden._max.numOrden ?? 0 ) + 1;
 
-    console.log( "siguienteNumOrden", siguienteNumOrden );
+    
 
     //todo: del array de actividades que recibo, debo actualizar las actividades que existan y las que no existen, se deben de crear
     const actividadesActualizadas = await Promise.all(
@@ -484,7 +483,7 @@ const registrarActividadesProceso = async ( req = request, res = response ) => {
         }
       } ) );
 
-    console.log( "Actividades actualizadas:", actividadesActualizadas );
+    
 
     res.json( {
       ok: true,

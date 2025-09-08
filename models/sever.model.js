@@ -21,6 +21,7 @@ class Server {
     this.fichaPath = '/api/ficha';
     this.unidadOperativaPath = '/api/unidad-operativa';
     this.usuarioPath = '/api/usuario';
+    this.rolPath = '/api/rol';
 
 
     // Http server
@@ -47,6 +48,7 @@ class Server {
     this.app.use( this.fichaPath, validarJWT, require( '../routes/ficha.routes' ) );
     this.app.use( this.unidadOperativaPath, validarJWT, require( '../routes/unidad-operativa.routes.js' ) );
     this.app.use( this.usuarioPath, validarJWT, require( '../routes/usuario.routes.js' ) );
+    this.app.use( this.rolPath, validarJWT, require( '../routes/rol.routes.js' ) );
 
 
   } 
@@ -68,8 +70,7 @@ class Server {
     //CORS
     this.app.use( cors() );
 
-    console.log( "se ejecuta el cors" );
-
+    
     //Lectura y parseo del body
     this.app.use( express.json() );
 

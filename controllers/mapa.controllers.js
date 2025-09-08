@@ -33,8 +33,6 @@ const registrarMapa = async ( req = request, res = response ) => {
 
   const { ruc, nombre, entrada, salida, descripcion } = req.body;
 
-  console.log( "Valores recibidos:", { ruc, nombre, entrada, salida, descripcion } );
-
   try {
     // Validar que el mapa no exista
     const mapaExistente = await prisma.mapa.findFirst( {
