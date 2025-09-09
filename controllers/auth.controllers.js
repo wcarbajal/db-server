@@ -15,7 +15,8 @@ const login = async ( req, res = response ) => {
     const usuarioDB = await prisma.usuario.findFirst( {
       where: {
         correo
-      }
+      },
+      include: { rol: true}
     } );
     if ( !usuarioDB ) {
       return res.status( 404 ).json( {
@@ -25,6 +26,7 @@ const login = async ( req, res = response ) => {
     }
     //validar password
     const validPassword = bcrytpjs.compareSync( password, usuarioDB.password );
+    //const validPassword = password === usuarioDB.password;
     if ( !validPassword ) {
       return res.status( 404 ).json( {
         ok: false,
@@ -121,7 +123,8 @@ const renovarToken = async ( req, res ) => {
   const usuarioDB = await prisma.usuario.findUnique( {
     where: {
       id
-    }
+    },
+    include: { rol: true }
 
   } );
   if ( !usuarioDB ) {
