@@ -1,5 +1,7 @@
 const { PrismaClient } = require( '@prisma/client' );
 const { request, response } = require( 'express' );
+const bcryptjs = require( 'bcryptjs' );
+const { ms } = require( 'zod/locales' );
 
 const prisma = new PrismaClient();
 
@@ -16,19 +18,19 @@ const getUsuarios = async ( req = request, res = response ) => {
         estado: true,
         mapas: {
           some: {
-            id: Number(mapaId)
+            id: Number( mapaId )
           }
         }
       },
       omit: {
         password: true
       },
-      include:{        
+      include: {
         rol: true,
         mapas: true
       }
     } );
-    
+
 
 
     // verificar que hayan usuarios
@@ -43,7 +45,7 @@ const getUsuarios = async ( req = request, res = response ) => {
       ok: true,
       usuarios
     } );
-    
+
   } catch ( error ) {
     console.error( error );
     res.status( 500 ).json( {
@@ -52,25 +54,64 @@ const getUsuarios = async ( req = request, res = response ) => {
     } );
   }
 };
-const updateUsuarios = async ( req = request, res = response ) => {
+const editarUsuario = async ( req = request, res = response ) => {
 
   const { id } = req.params;
-  const { nombre, correo, password, rol } = req.body;
+  const { nombre, apellidoPaterno, apellidoMaterno, correo, password, rol } = req.body;
 
   try {
+    // verificar si el usuario existe
+    const usuarioExistente = await prisma.usuario.findUnique( {
+      where: { 
+        id: Number( id ) ,
+        estado: true
+      }
+    } );
+    if ( !usuarioExistente ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'El usuario no existe'
+      } );
+    }
+
+    //ecriptar la contraseña si se proporciona una nueva
+    let passwordEncript;
+    if ( password ) {
+      // Aquí deberías agregar la lógica para encriptar la contraseña
+      // Por ejemplo, usando bcrypt:
+      const salt = bcryptjs.genSaltSync();
+      passwordEncript = bcryptjs.hashSync( password, salt );
+    }
+
     const usuario = await prisma.usuario.update( {
       where: { id },
       data: {
-        nombre,
-        correo,
-        password,
-        rol
+        nombre: nombre || usuarioExistente.nombre,
+        apellidoPaterno: apellidoPaterno || usuarioExistente.apellidoPaterno,
+        apellidoMaterno: apellidoMaterno || usuarioExistente.apellidoMaterno,
+        correo: correo || usuarioExistente.correo,
+        password: passwordEncript || usuarioExistente.password
       }
-    } );
+    });
+
+    // si el rol ha cambiado, actualizar la relación
+    if ( rol && rol !== usuarioExistente.rol ) {
+      await prisma.usuario.update( {
+        where: { id },
+        data: {
+          rol: {
+            connect: { id: rol }
+          }
+        }
+      });
+    }
+    
     res.json( {
       ok: true,
+      msg: 'Usuario actualizado',
       usuario
     } );
+
   } catch ( error ) {
     console.error( error );
     res.status( 500 ).json( {
@@ -79,12 +120,18 @@ const updateUsuarios = async ( req = request, res = response ) => {
     } );
   }
 };
-const registerUsuarios = async ( req = request, res = response ) => {
+const registrarUsuarios = async ( req = request, res = response ) => {
 
-  const { nombre, correo, password, rol } = req.body; 
+  const { mapaId } = req.params;
+
+  const { nombre, apellidoPaterno, apellidoMaterno, correo, password, rol } = req.body;
+
   try {
     const usuarioExistente = await prisma.usuario.findUnique( {
-      where: { correo }
+      where: { 
+        correo,
+        estado: true
+      }
     } );
     if ( usuarioExistente ) {
       return res.status( 400 ).json( {
@@ -92,16 +139,22 @@ const registerUsuarios = async ( req = request, res = response ) => {
         msg: 'El usuario ya existe'
       } );
     }
+    const salt = bcryptjs.genSaltSync();
+    const passwordEncript = bcryptjs.hashSync( password, salt );
+
     const nuevoUsuario = await prisma.usuario.create( {
       data: {
         nombre,
+        apellidoPaterno,
+        apellidoMaterno,
         correo,
-        password,
+        password: passwordEncript,
         rol
       }
     } );
     res.status( 201 ).json( {
       ok: true,
+      msg: 'Usuario registrado',
       usuario: nuevoUsuario
     } );
   } catch ( error ) {
@@ -135,7 +188,7 @@ const eliminarUsuarios = async ( req = request, res = response ) => {
 
 module.exports = {
   getUsuarios,
-  updateUsuarios,
-  registerUsuarios,
+  editarUsuario,
+  registrarUsuarios,
   eliminarUsuarios
 };

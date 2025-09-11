@@ -3,13 +3,11 @@ const { check } = require( 'express-validator' );
 const { validarCampos } = require( '../middlewares/validar-campos' );
 const {
   getUsuarios,
-  updateUsuarios,
-  registerUsuarios,
+  editarUsuario,
+  registrarUsuarios,
   eliminarUsuarios,
 
 } = require( '../controllers/usuario.controllers' );
-
-
 
 /* 
  this.usuarioPath = '/api/usuario';
@@ -21,17 +19,17 @@ route.get( '/:mapaId', [
   validarCampos,
 ], getUsuarios );
 
-route.put( '/:id', [  
+route.put( '/:id', [
   validarCampos
-], updateUsuarios );
+], editarUsuario );
 
-route.post( '/', [
+route.post( '/:mapaId', [
   check( 'nombre', 'El nombre es obligatorio' ).not().isEmpty(),
   check( 'correo', 'El correo es obligatorio' ).isEmail(),
   check( 'password', 'La contraseña es obligatoria' ).not().isEmpty(),
   check( 'rol', 'El rol es obligatorio' ).not().isEmpty(),
   validarCampos
-], registerUsuarios );
+], registrarUsuarios );
 
 route.delete( '/:id', [
   check( 'id', 'El ID debe ser válido' ).isMongoId(),
