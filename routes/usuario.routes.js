@@ -5,7 +5,7 @@ const {
   getUsuarios,
   editarUsuario,
   registrarUsuarios,
-  eliminarUsuarios,
+  eliminarUsuario,
 
 } = require( '../controllers/usuario.controllers' );
 
@@ -24,17 +24,13 @@ route.put( '/:id', [
 ], editarUsuario );
 
 route.post( '/:mapaId', [
-  check( 'nombre', 'El nombre es obligatorio' ).not().isEmpty(),
-  check( 'correo', 'El correo es obligatorio' ).isEmail(),
-  check( 'password', 'La contraseña es obligatoria' ).not().isEmpty(),
-  check( 'rol', 'El rol es obligatorio' ).not().isEmpty(),
   validarCampos
 ], registrarUsuarios );
 
 route.delete( '/:id', [
-  check( 'id', 'El ID debe ser válido' ).isMongoId(),
+  
   validarCampos
-], eliminarUsuarios );
+], eliminarUsuario );
 
 
 

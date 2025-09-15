@@ -8,6 +8,8 @@ const { validarCampos } = require( '../middlewares/validar-campos' );
 
 const router = Router();
 
+/* this.ownersPath = '/api/owners'; */
+
 
 router.get( '/:mapaId', [
 

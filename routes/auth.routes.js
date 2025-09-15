@@ -26,18 +26,6 @@ router.post( '/registrar', [
   check( 'password', 'El password es obligatorio' ).not().isEmpty(),
   check( 'password', 'El password debe tener entre 6 y 15 caracteres' ).isLength( { min: 6, max: 15 } ),
   check( 'correo', 'El correo no es valido' ).isEmail(),
-  /* check( 'rol', 'No es un rol permitido' ).isIn(['ADMIN_ROLE', 'USER_ROLE']), */
-  check( 'rol' ).custom( async ( rol = '' ) => {
-    const existeRol = await prisma.roles.findFirst( {
-      where: {
-        rol
-      }
-    } );
-
-    if ( !existeRol ) {
-      throw new Error( 'EL rol no esta registrado en la base de datos Z' );
-    }
-  } ),
   validarCampos
 ], crearUsuario );
 

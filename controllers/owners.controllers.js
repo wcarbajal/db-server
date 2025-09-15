@@ -12,6 +12,8 @@ const listaOwners = async ( req = request, res = response ) => {
 
   const { mapaId } = req.params;
 
+  console.log("mapaId recibido:", mapaId);
+
   try {
     const owners = await prisma.owner.findMany( {
       where: { estado: true, mapaId: Number( mapaId ) },
@@ -22,6 +24,8 @@ const listaOwners = async ( req = request, res = response ) => {
         unidadOperativa: true
       }
     } );
+
+    console.log("Owners encontrados:", owners);
 
     if ( !owners || owners.length === 0 ) {
       return res.status( 404 ).json( {

@@ -62,8 +62,8 @@ const editarUsuario = async ( req = request, res = response ) => {
   try {
     // verificar si el usuario existe
     const usuarioExistente = await prisma.usuario.findUnique( {
-      where: { 
-        id: Number( id ) ,
+      where: {
+        id: Number( id ),
         estado: true
       }
     } );
@@ -92,7 +92,7 @@ const editarUsuario = async ( req = request, res = response ) => {
         correo: correo || usuarioExistente.correo,
         password: passwordEncript || usuarioExistente.password
       }
-    });
+    } );
 
     // si el rol ha cambiado, actualizar la relación
     if ( rol && rol !== usuarioExistente.rol ) {
@@ -103,9 +103,9 @@ const editarUsuario = async ( req = request, res = response ) => {
             connect: { id: rol }
           }
         }
-      });
+      } );
     }
-    
+
     res.json( {
       ok: true,
       msg: 'Usuario actualizado',
@@ -128,7 +128,7 @@ const registrarUsuarios = async ( req = request, res = response ) => {
 
   try {
     const usuarioExistente = await prisma.usuario.findUnique( {
-      where: { 
+      where: {
         correo,
         estado: true
       }
@@ -149,9 +149,18 @@ const registrarUsuarios = async ( req = request, res = response ) => {
         apellidoMaterno,
         correo,
         password: passwordEncript,
-        rol
+        rol: {
+          connect: { id: rol }
+        },
+        mapas: {
+          connect: {
+            id: Number( mapaId )
+          }
+        }
       }
     } );
+
+
     res.status( 201 ).json( {
       ok: true,
       msg: 'Usuario registrado',
@@ -166,13 +175,41 @@ const registrarUsuarios = async ( req = request, res = response ) => {
   }
 };
 
-const eliminarUsuarios = async ( req = request, res = response ) => {
+const eliminarUsuario = async ( req = request, res = response ) => {
   const { id } = req.params;
 
   try {
-    const usuario = await prisma.usuario.delete( {
-      where: { id }
+    const usuarioExiste = await prisma.usuario.findUnique( {
+      where: {
+        id: Number( id ),
+        estado: true
+      }
     } );
+    if ( !usuarioExiste ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'El usuario no existe'
+      } );
+    }
+    if( usuarioExiste.rolesId === 1 ){
+      return res.status( 401 ).json( {
+        ok: false,
+        msg: 'No se puede eliminar un usuario con rol de administrador'
+      } );
+    }
+
+    const usuario = await prisma.usuario.update( {
+      where: { id: Number( id ) },
+      data: {
+        estado: false,
+        correo: { set: `eliminado_${ Date.now() }_${ usuarioExiste.correo }` },
+
+        
+        mapas: { set: [] }
+      }
+    } );
+
+
     res.json( {
       ok: true,
       usuario
@@ -190,5 +227,5 @@ module.exports = {
   getUsuarios,
   editarUsuario,
   registrarUsuarios,
-  eliminarUsuarios
+  eliminarUsuario
 };

@@ -1,4 +1,4 @@
- // This is your Prisma schema file,
+// This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
@@ -17,8 +17,8 @@ datasource db {
 }
 
 model Roles {
-  id  Int    @id @default(autoincrement())
-  rol String @unique
+  id     Int     @id @default(autoincrement())
+  rol    String  @unique
   estado Boolean @default(true)
 
   Usuario Usuario[]
@@ -39,8 +39,7 @@ model Usuario {
   rolesId             Int
   procesosResponsable Proceso[] @relation("ProcesoResponsables")
 
-  mapas               Mapa[]    @relation("UsuarioMapas") // <--- Relación muchos a muchos
-  
+  mapas Mapa[] @relation("UsuarioMapas") // <--- Relación muchos a muchos
 }
 
 model Owner {
@@ -78,7 +77,7 @@ model Mapa {
   Owner           Owner[]
   UnidadOperativa UnidadOperativa[]
 
-   usuarios        Usuario[]         @relation("UsuarioMapas") // <--- Relación muchos a muchos
+  usuarios Usuario[] @relation("UsuarioMapas") // <--- Relación muchos a muchos
 }
 
 model Proceso {
@@ -105,7 +104,7 @@ model Proceso {
   diagrama    Diagrama?
   ficha       Ficha?
   actividades Actividad[]
-  indicadores indicador[]
+  indicadores Indicador[]
   mapa        Mapa        @relation(fields: [mapaId], references: [id])
   mapaId      Int
 
@@ -143,10 +142,15 @@ model Actividad {
   proceso         Proceso @relation(fields: [procesoId], references: [id])
 }
 
-model indicador {
-  id              Int     @id @default(autoincrement())
-  nombre          String
-  tipo            String
+model Indicador {
+  id            Int                      @id @default(autoincrement())
+  codigo        String                   @unique
+  nombre        String
+  tipoNivel     TipoIndicadorNivel
+  estado        Boolean                  @default(true)
+  creadoEn      DateTime                 @default(now())
+  actualizadoEn DateTime                 @updatedAt
+
   justificacion   String?
   formula         String?
   sentidoEsperado String?
@@ -156,8 +160,31 @@ model indicador {
   logrosEsperados String?
   lineaBase       String?
 
+  parentId Int?
+  parent   Indicador?  @relation("IndicadorParent", fields: [parentId], references: [id])
+  hijos    Indicador[] @relation("IndicadorParent")
+
   procesoId Int
   proceso   Proceso @relation(fields: [procesoId], references: [id])
+
+  Resultado Resultado[]
+}
+
+model Resultado {
+  id            Int      @id @default(autoincrement())
+  denominacion  String?
+  descripcion   String?
+  valor         Float
+  fechaRegistro DateTime @updatedAt 
+
+  indicadorId   Int
+  indicador     Indicador @relation(fields: [indicadorId], references: [id])
+}
+
+enum TipoIndicadorNivel {
+  OEI // Objetivo Estratégico Institucional
+  AEI // Acción Estratégica Institucional
+  IO // Indicador operativo
 }
 
 model InputOutput {
