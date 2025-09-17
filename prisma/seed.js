@@ -215,6 +215,152 @@ async function main() {
       online: false
     }
   } );
+
+  await prisma.indicador.createMany( {
+    data: [
+      {
+        /* "id": 1, */
+        "codigo": "EOI.01",
+        "nombre": "eSTRATEGICO",
+        "estado": true,
+        "creadoEn": "2025-09-16T17:56:52.015Z",
+        "actualizadoEn": "2025-08-31T20:12:28.926Z",
+        "justificacion": null,
+        "formula": null,
+        "sentidoEsperado": null,
+        "unidadMedida": null,
+        "frecuencia": null,
+        "fuenteDatos": null,
+        "logrosEsperados": null,
+        "lineaBase": null,
+        "parentId": null,
+        "procesoId": null,
+        "tipoNivel": "OEI",
+        "mapaId": 1
+      },
+      {
+        /* "id": 2, */
+        "codigo": "AEI.01",
+        "nombre": "Actividad estrategica",
+        "estado": true,
+        "creadoEn": "2025-09-17T01:08:13.378Z",
+        "actualizadoEn": "2025-08-31T20:12:28.926Z",
+        "justificacion": null,
+        "formula": null,
+        "sentidoEsperado": null,
+        "unidadMedida": null,
+        "frecuencia": null,
+        "fuenteDatos": null,
+        "logrosEsperados": null,
+        "lineaBase": null,
+        "parentId": 1,
+        "procesoId": null,
+        "tipoNivel": "AEI",
+        "mapaId": 1
+      },
+      {
+        /* "id": 3, */
+        "codigo": "AEI.02",
+        "nombre": "Actividad Estrategica 2",
+        "estado": true,
+        "creadoEn": "2025-09-17T01:08:13.378Z",
+        "actualizadoEn": "2025-08-31T20:12:28.926Z",
+        "justificacion": null,
+        "formula": null,
+        "sentidoEsperado": null,
+        "unidadMedida": null,
+        "frecuencia": null,
+        "fuenteDatos": null,
+        "logrosEsperados": null,
+        "lineaBase": null,
+        "parentId": 2,
+        "procesoId": null,
+        "tipoNivel": "AEI",
+        "mapaId": 1
+      },
+      {
+        /* "id": 4, */
+        "codigo": "IP.01",
+        "nombre": "Indicador de proceso",
+        "estado": true,
+        "creadoEn": "2025-09-17T03:40:40.532Z",
+        "actualizadoEn": "2025-08-31T20:12:28.926Z",
+        "justificacion": null,
+        "formula": null,
+        "sentidoEsperado": null,
+        "unidadMedida": null,
+        "frecuencia": null,
+        "fuenteDatos": null,
+        "logrosEsperados": null,
+        "lineaBase": null,
+        "parentId": 1,
+        "procesoId": null,
+        "tipoNivel": "IO",
+        "mapaId": 1
+      },
+      {
+        /* "id": 5, */
+        "codigo": "IP.02",
+        "nombre": "Indicdor de proceso 2",
+        "estado": true,
+        "creadoEn": "2025-09-17T03:42:09.057Z",
+        "actualizadoEn": "2025-08-31T20:12:28.926Z",
+        "justificacion": null,
+        "formula": null,
+        "sentidoEsperado": null,
+        "unidadMedida": null,
+        "frecuencia": null,
+        "fuenteDatos": null,
+        "logrosEsperados": null,
+        "lineaBase": null,
+        "parentId": 3,
+        "procesoId": null,
+        "tipoNivel": "IO",
+        "mapaId": 1
+      },
+      {
+        /* "id": 6, */
+        "codigo": "IP.03",
+        "nombre": "Indicdor de proceso 3",
+        "estado": true,
+        "creadoEn": "2025-09-17T03:42:09.057Z",
+        "actualizadoEn": "2025-08-31T20:12:28.926Z",
+        "justificacion": null,
+        "formula": null,
+        "sentidoEsperado": null,
+        "unidadMedida": null,
+        "frecuencia": null,
+        "fuenteDatos": null,
+        "logrosEsperados": null,
+        "lineaBase": null,
+        "parentId": 3,
+        "procesoId": null,
+        "tipoNivel": "IO",
+        "mapaId": 1
+      },
+      {
+        /* "id": 8, */
+        "codigo": "IP.04",
+        "nombre": "Indicadore de proceos",
+        "estado": true,
+        "creadoEn": "2025-09-17T03:43:18.236Z",
+        "actualizadoEn": "2025-08-31T20:12:28.926Z",
+        "justificacion": null,
+        "formula": null,
+        "sentidoEsperado": null,
+        "unidadMedida": null,
+        "frecuencia": null,
+        "fuenteDatos": null,
+        "logrosEsperados": null,
+        "lineaBase": null,
+        "parentId": 2,
+        "procesoId": null,
+        "tipoNivel": "IO",
+        "mapaId": 1
+      }
+    ]
+  } );
+
 }
 
 main()

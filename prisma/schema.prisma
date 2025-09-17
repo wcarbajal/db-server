@@ -77,7 +77,8 @@ model Mapa {
   Owner           Owner[]
   UnidadOperativa UnidadOperativa[]
 
-  usuarios Usuario[] @relation("UsuarioMapas") // <--- Relación muchos a muchos
+  usuarios  Usuario[]   @relation("UsuarioMapas") // <--- Relación muchos a muchos
+  Indicador Indicador[]
 }
 
 model Proceso {
@@ -143,13 +144,13 @@ model Actividad {
 }
 
 model Indicador {
-  id            Int                      @id @default(autoincrement())
-  codigo        String                   @unique
+  id            Int                @id @default(autoincrement())
+  codigo        String             @unique
   nombre        String
   tipoNivel     TipoIndicadorNivel
-  estado        Boolean                  @default(true)
-  creadoEn      DateTime                 @default(now())
-  actualizadoEn DateTime                 @updatedAt
+  estado        Boolean            @default(true)
+  creadoEn      DateTime           @default(now())
+  actualizadoEn DateTime           @updatedAt
 
   justificacion   String?
   formula         String?
@@ -164,10 +165,12 @@ model Indicador {
   parent   Indicador?  @relation("IndicadorParent", fields: [parentId], references: [id])
   hijos    Indicador[] @relation("IndicadorParent")
 
-  procesoId Int
-  proceso   Proceso @relation(fields: [procesoId], references: [id])
+  procesoId Int?
+  proceso   Proceso? @relation(fields: [procesoId], references: [id])
+  mapa      Mapa     @relation(fields: [mapaId], references: [id])
+  mapaId    Int
 
-  Resultado Resultado[]
+  resultado Resultado[]
 }
 
 model Resultado {
@@ -175,10 +178,10 @@ model Resultado {
   denominacion  String?
   descripcion   String?
   valor         Float
-  fechaRegistro DateTime @updatedAt 
+  fechaRegistro DateTime @updatedAt
 
-  indicadorId   Int
-  indicador     Indicador @relation(fields: [indicadorId], references: [id])
+  indicadorId Int
+  indicador   Indicador @relation(fields: [indicadorId], references: [id])
 }
 
 enum TipoIndicadorNivel {
