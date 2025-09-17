@@ -64,14 +64,14 @@ const getIndicadores = async ( req = request, res = response ) => {
 const crearIndicador = async ( req = request, res = response ) => {
 
   const { mapaId } = req.params;
-  const { codigo, nombre, tipoNivel } = req.body;
+  const { codigo, nombre, tipoNivel, parentId } = req.body;
 
   try {
 
     const indicadorExistente = await prisma.indicador.findFirst( {
       where: {
         codigo,
-        mapaId
+        mapaId: Number( mapaId )
       }
     } );
     if ( indicadorExistente ) {
@@ -87,10 +87,17 @@ const crearIndicador = async ( req = request, res = response ) => {
         nombre,
         tipoNivel,
         mapa: {
-          connect: { id: mapaId }
+          connect: { id: Number( mapaId ) }
         }
       }
     } );
+
+    if ( parentId ) {
+      await prisma.indicador.update( {
+        where: { id: nuevoIndicador.id },
+        data: { parentId: Number( parentId ) }
+      } );
+    }
 
     res.status( 201 ).json( {
       ok: true,
@@ -105,7 +112,40 @@ const crearIndicador = async ( req = request, res = response ) => {
   }
 };
 
-module.exports = {
-  getIndicadores,
-  crearIndicador
+const modificarIndicador = async ( req = request, res = response ) => {
+
+  //TODO: Revisar
+  
+  const { id } = req.params;
+  const { codigo, nombre, tipoNivel, parentId } = req.body;
+  try {
+    const indicador = await prisma.indicador.findUnique( {
+      where: { id: Number( id ) }
+    } );
+    if ( !indicador ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'No se encontró el indicador'
+      } );
+    }
+    const indicadorActualizado = await prisma.indicador.update( {
+      where: { id: Number( id ) },
+      data: {
+        codigo,
+        nombre,
+        tipoNivel,
+        parentId: parentId ? Number( parentId ) : null
+      }
+    } );
+    res.json( {
+      ok: true,
+      indicador: indicadorActualizado
+    } );
+  } catch ( error ) {
+    console.log( error );
+    res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al modificar el indicador'
+    } );
+  }
 };
