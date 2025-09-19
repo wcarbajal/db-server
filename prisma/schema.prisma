@@ -144,17 +144,18 @@ model Actividad {
 }
 
 model Indicador {
-  id            Int                @id @default(autoincrement())
-  codigo        String             @unique
-  nombre        String
-  tipoNivel     TipoIndicadorNivel
-  estado        Boolean            @default(true)
-  creadoEn      DateTime           @default(now())
-  actualizadoEn DateTime           @updatedAt
+  id             Int            @id @default(autoincrement())
+  codigo         String         @unique
+  nombre         String
+  nivelIndicador NivelIndicador
+  tipoIndicador  TipoIndicador?
+  estado         Boolean        @default(true)
+  creadoEn       DateTime       @default(now())
+  actualizadoEn  DateTime       @updatedAt
 
   justificacion   String?
   formula         String?
-  sentidoEsperado String?
+  sentidoEsperado SentidoEsperado @default(ascendente)
   unidadMedida    String?
   frecuencia      String?
   fuenteDatos     String?
@@ -184,10 +185,29 @@ model Resultado {
   indicador   Indicador @relation(fields: [indicadorId], references: [id])
 }
 
-enum TipoIndicadorNivel {
+model UnidadMedida{
+  id     Int    @id @default(autoincrement())
+  nombre String
+  siglas String
+  estado Boolean @default(true)
+}
+enum SentidoEsperado {
+  ascendente
+  descendente
+}
+
+enum NivelIndicador {
   OEI // Objetivo Estratégico Institucional
   AEI // Acción Estratégica Institucional
-  IO // Indicador operativo
+  PE //Producto Estratégico
+  AO // Actividad Operativa
+  IG // Indicador de Gestión
+}
+
+enum TipoIndicador {
+  IR // Indicador de Resultados
+  IP // Indicador de producto
+  IA // Indicador de actividad
 }
 
 model InputOutput {
