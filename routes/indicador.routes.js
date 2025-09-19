@@ -4,7 +4,9 @@ const { validarCampos } = require( '../middlewares/validar-campos' );
 const {
   getIndicadores,
   crearIndicador,
-  modificarIndicador
+  modificarIndicador,
+  getIndicador,
+  eliminarIndicador
 } = require( '../controllers/indicador.controllers' );
 
 /* 
@@ -18,10 +20,19 @@ route.get( '/:mapaId', [
   validarCampos
 ], getIndicadores );
 
+route.get( '/unico/:Id', [
+  validarCampos
+], getIndicador );
+
 route.put( '/:id', [
   validarCampos
 ], modificarIndicador );
 
+route.delete( '/:id', [
+  check( 'id', 'El id del indicador es obligatorio' ).not().isEmpty(),
+  check( 'id', 'El id del indicador debe ser un número' ).isNumeric(),
+  validarCampos
+], eliminarIndicador );
 
 route.post( '/:mapaId', [
   validarCampos
