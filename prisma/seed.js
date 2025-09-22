@@ -219,7 +219,7 @@ async function main() {
   await prisma.indicador.createMany( {
     data: [
       {
-        /* "id": 1, */
+        
         "codigo": "EOI.01",
         "nombre": "eSTRATEGICO",
         "estado": true,
@@ -227,7 +227,7 @@ async function main() {
         "actualizadoEn": "2025-08-31T20:12:28.926Z",
         "justificacion": null,
         "formula": null,
-        "sentidoEsperado": null,
+        "sentidoEsperado": "Ascendente",
         "unidadMedida": null,
         "frecuencia": null,
         "fuenteDatos": null,
@@ -235,11 +235,11 @@ async function main() {
         "lineaBase": null,
         "parentId": null,
         "procesoId": null,
-        "tipoNivel": "OEI",
+        "nivelIndicador": "OEI",        
         "mapaId": 1
       },
       {
-        /* "id": 2, */
+        
         "codigo": "AEI.01",
         "nombre": "Actividad estrategica",
         "estado": true,
@@ -247,7 +247,7 @@ async function main() {
         "actualizadoEn": "2025-08-31T20:12:28.926Z",
         "justificacion": null,
         "formula": null,
-        "sentidoEsperado": null,
+        "sentidoEsperado": "Ascendente",
         "unidadMedida": null,
         "frecuencia": null,
         "fuenteDatos": null,
@@ -255,11 +255,12 @@ async function main() {
         "lineaBase": null,
         "parentId": 1,
         "procesoId": null,
-        "tipoNivel": "AEI",
+        "nivelIndicador": "OEI",
+        "tipoIndicador": "IP",
         "mapaId": 1
       },
       {
-        /* "id": 3, */
+        
         "codigo": "AEI.02",
         "nombre": "Actividad Estrategica 2",
         "estado": true,
@@ -267,7 +268,7 @@ async function main() {
         "actualizadoEn": "2025-08-31T20:12:28.926Z",
         "justificacion": null,
         "formula": null,
-        "sentidoEsperado": null,
+        "sentidoEsperado": "Ascendente",
         "unidadMedida": null,
         "frecuencia": null,
         "fuenteDatos": null,
@@ -275,11 +276,12 @@ async function main() {
         "lineaBase": null,
         "parentId": 2,
         "procesoId": null,
-        "tipoNivel": "AEI",
+        "nivelIndicador": "AEI",
+        "tipoIndicador": "IP",
         "mapaId": 1
       },
       {
-        /* "id": 4, */
+        
         "codigo": "IP.01",
         "nombre": "Indicador de proceso",
         "estado": true,
@@ -287,7 +289,7 @@ async function main() {
         "actualizadoEn": "2025-08-31T20:12:28.926Z",
         "justificacion": null,
         "formula": null,
-        "sentidoEsperado": null,
+        "sentidoEsperado": "Ascendente",
         "unidadMedida": null,
         "frecuencia": null,
         "fuenteDatos": null,
@@ -295,11 +297,12 @@ async function main() {
         "lineaBase": null,
         "parentId": 1,
         "procesoId": null,
-        "tipoNivel": "IO",
+        "nivelIndicador": "AO",
+        "tipoIndicador": "IP",
         "mapaId": 1
       },
       {
-        /* "id": 5, */
+        
         "codigo": "IP.02",
         "nombre": "Indicdor de proceso 2",
         "estado": true,
@@ -307,7 +310,7 @@ async function main() {
         "actualizadoEn": "2025-08-31T20:12:28.926Z",
         "justificacion": null,
         "formula": null,
-        "sentidoEsperado": null,
+        "sentidoEsperado": "Ascendente",
         "unidadMedida": null,
         "frecuencia": null,
         "fuenteDatos": null,
@@ -315,11 +318,12 @@ async function main() {
         "lineaBase": null,
         "parentId": 3,
         "procesoId": null,
-        "tipoNivel": "IO",
+        "nivelIndicador": "AO",
+        "tipoIndicador": "IP",
         "mapaId": 1
       },
       {
-        /* "id": 6, */
+        
         "codigo": "IP.03",
         "nombre": "Indicdor de proceso 3",
         "estado": true,
@@ -327,7 +331,7 @@ async function main() {
         "actualizadoEn": "2025-08-31T20:12:28.926Z",
         "justificacion": null,
         "formula": null,
-        "sentidoEsperado": null,
+        "sentidoEsperado": "Ascendente",
         "unidadMedida": null,
         "frecuencia": null,
         "fuenteDatos": null,
@@ -335,11 +339,12 @@ async function main() {
         "lineaBase": null,
         "parentId": 3,
         "procesoId": null,
-        "tipoNivel": "IO",
+        "nivelIndicador": "AO",
+        "tipoIndicador": "IP",
         "mapaId": 1
       },
       {
-        /* "id": 8, */
+        
         "codigo": "IP.04",
         "nombre": "Indicadore de proceos",
         "estado": true,
@@ -347,7 +352,7 @@ async function main() {
         "actualizadoEn": "2025-08-31T20:12:28.926Z",
         "justificacion": null,
         "formula": null,
-        "sentidoEsperado": null,
+        "sentidoEsperado": "Ascendente",
         "unidadMedida": null,
         "frecuencia": null,
         "fuenteDatos": null,
@@ -355,7 +360,8 @@ async function main() {
         "lineaBase": null,
         "parentId": 2,
         "procesoId": null,
-        "tipoNivel": "IO",
+        "nivelIndicador": "AO",
+        "tipoIndicador": "IP",
         "mapaId": 1
       }
     ]

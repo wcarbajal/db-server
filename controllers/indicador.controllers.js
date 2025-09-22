@@ -5,6 +5,7 @@ const path = require( 'path' );
 const prisma = new PrismaClient();
 
 const getIndicadores = async ( req = request, res = response ) => {
+  console.log("inicio de getIndicadores")
   const { mapaId } = req.params;
 
   try {
@@ -46,6 +47,8 @@ const getIndicadores = async ( req = request, res = response ) => {
         msg: 'No se encontraron indicadores para este mapa'
       } );
     }
+    console.log({indicadores});
+    console.log({raiz})
 
     res.json( {
       ok: true,
@@ -64,7 +67,7 @@ const getIndicadores = async ( req = request, res = response ) => {
 const crearIndicador = async ( req = request, res = response ) => {
 
   const { mapaId } = req.params;
-  const { codigo, nombre, tipoNivel, parentId } = req.body;
+  const { codigo, nombre, nivelIndicador, tipoIndicador, parentId } = req.body;
 
   try {
 
@@ -85,7 +88,8 @@ const crearIndicador = async ( req = request, res = response ) => {
       data: {
         codigo,
         nombre,
-        tipoNivel,
+        nivelIndicador,
+        tipoIndicador,
         mapa: {
           connect: { id: Number( mapaId ) }
         }
@@ -113,12 +117,12 @@ const crearIndicador = async ( req = request, res = response ) => {
 };
 
 const modificarIndicador = async ( req = request, res = response ) => {
-
-  //TODO: Revisar
-
   const { id } = req.params;
-
-  const { codigo, nombre, tipoNivel, parentId, formula, frecuencia, fuenteDatos, justificacion, lineaBase, logrosEsperados, sentidoEsperado, unidadMedida } = req.body;
+  const camposPermitidos = [
+    "codigo", "nombre", "nivelIndicador", "tipoIndicador", "parentId",
+    "formula", "frecuencia", "fuenteDatos", "justificacion", "lineaBase",
+    "logrosEsperados", "sentidoEsperado", "unidadMedida"
+  ];
 
   try {
     const indicador = await prisma.indicador.findUnique( {
@@ -130,27 +134,31 @@ const modificarIndicador = async ( req = request, res = response ) => {
         msg: 'No se encontró el indicador'
       } );
     }
+
+    // Construir el objeto data solo con los campos enviados
+    const data = {};
+
+    for ( const campo of camposPermitidos ) {
+      if ( Object.prototype.hasOwnProperty.call( req.body, campo ) ) {
+        // Si el campo es parentId y es null o vacío, lo asigna como null
+        if ( campo === "parentId" ) {
+          data.parentId = req.body.parentId ? Number( req.body.parentId ) : null;
+        } else {
+          data[ campo ] = req.body[ campo ];
+        }
+      }
+    }
+
     const indicadorActualizado = await prisma.indicador.update( {
       where: { id: Number( id ) },
-      data: {
-        codigo: codigo || indicador.codigo,
-        nombre: nombre || indicador.nombre,
-        tipoNivel: tipoNivel || indicador.tipoNivel,
-        parentId: parentId ? Number( parentId ) : indicador.parentId,
-        formula: formula || indicador.formula,
-        frecuencia: frecuencia || indicador.frecuencia,
-        fuenteDatos: fuenteDatos || indicador.fuenteDatos,
-        justificacion: justificacion || indicador.justificacion,
-        lineaBase: lineaBase || indicador.lineaBase,
-        logrosEsperados: logrosEsperados || indicador.logrosEsperados,
-        sentidoEsperado: sentidoEsperado || indicador.sentidoEsperado,
-        unidadMedida: unidadMedida || indicador.unidadMedida,
-      }
+      data
     } );
+
     res.json( {
       ok: true,
       indicador: indicadorActualizado
     } );
+
   } catch ( error ) {
     console.log( error );
     res.status( 500 ).json( {

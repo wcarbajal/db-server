@@ -369,6 +369,8 @@ const obtenerDataChart = async ( req = request, res = response ) => {
       } );
     }
 
+    
+
     // 1. Procesos por tipo
     const procesosPorTipo = await prisma.proceso.groupBy( {
       where: { estado: true, mapaId: Number( id ) },
@@ -382,17 +384,7 @@ const obtenerDataChart = async ( req = request, res = response ) => {
     } ) );
 
 
-    // version con map, pero Promise.all, dao que no se puede usar .map con await dentro de un callback, map no espera las promesas
-    /*  const listadoPorTipo = {};
-     await Promise.all(
-       procesosPorTipo.map( async ( tipoObj ) => {
-         const tipo = tipoObj.tipo;
-         listadoPorTipo[ tipo ] = await prisma.proceso.findMany( {
-           where: { tipo, estado: true },
-           select: { id: true, codigo: true, nombre: true, tipo: true }
-         } );
-       } )
-     ); */
+
 
     // 2. Procesos por nivel
     const procesosPorNivel = await prisma.proceso.groupBy( {
@@ -406,14 +398,6 @@ const obtenerDataChart = async ( req = request, res = response ) => {
       cantidad: item._count.nivel
     } ) );
 
-    /*  const listadoPorNivel = {};
-     for ( const nivelObj of procesosPorNivel ) {
-       const nivel = nivelObj.nivel;
-       listadoPorNivel[ nivel ] = await prisma.proceso.findMany( {
-         where: { nivel, estado: true },
-         select: { id: true, codigo: true, nombre: true, nivel: true }
-       } );
-     } */
 
     // 3. Procesos por responsables
     const responsables = await prisma.owner.findMany( {
@@ -450,8 +434,8 @@ const obtenerDataChart = async ( req = request, res = response ) => {
     res.json( {
       ok: true,
       msg: "Resumen de procesos",
-      porTipo: resumenPorTipo,
-      porNivel: resumenPorNivel,     
+      procesosPorTipo: resumenPorTipo,
+      procesosPorNivel: resumenPorNivel,
     } );
   } catch ( error ) {
     console.error( error );

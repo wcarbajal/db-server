@@ -155,7 +155,7 @@ model Indicador {
 
   justificacion   String?
   formula         String?
-  sentidoEsperado SentidoEsperado @default(ascendente)
+  sentidoEsperado SentidoEsperado @default(Ascendente)
   unidadMedida    String?
   frecuencia      String?
   fuenteDatos     String?
@@ -192,8 +192,8 @@ model UnidadMedida{
   estado Boolean @default(true)
 }
 enum SentidoEsperado {
-  ascendente
-  descendente
+  Ascendente
+  Descendente
 }
 
 enum NivelIndicador {
