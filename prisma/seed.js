@@ -215,6 +215,15 @@ async function main() {
       online: false
     }
   } );
+  
+await prisma.usuario.update({
+  where: { id: 1 },
+  data: {
+    mapas: {
+      connect: { id: 1 }
+    }
+  }
+});
 
   await prisma.indicador.createMany( {
     data: [

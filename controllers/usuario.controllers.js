@@ -9,6 +9,7 @@ const prisma = new PrismaClient();
 const getUsuarios = async ( req = request, res = response ) => {
 
   const { mapaId } = req.params;
+  
 
   try {
     // buscar los usuarios que tengan asignado n-mapas
@@ -31,7 +32,7 @@ const getUsuarios = async ( req = request, res = response ) => {
       }
     } );
 
-
+console.log({usuarios})
 
     // verificar que hayan usuarios
     if ( !usuarios || usuarios.length === 0 ) {
