@@ -153,6 +153,7 @@ model Indicador {
   creadoEn       DateTime       @default(now())
   actualizadoEn  DateTime       @updatedAt
 
+  descripcion    String?
   justificacion   String?
   formula         String?
   sentidoEsperado SentidoEsperado @default(Ascendente)
