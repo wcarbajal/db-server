@@ -728,7 +728,46 @@ const registrarDiagramaProceso = async ( req = request, res = response ) => {
   }
 };
 
+const actualizarIndicadores = async ( req = request, res = response ) => {
+  const { procesoId, indicadores } = req.body;
 
+  try {
+    // Verificar si el proceso existe
+    const procesoExistente = await prisma.proceso.findUnique( {
+      where: { id: Number( procesoId ) }
+    } );
+
+    if ( !procesoExistente ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'Proceso no encontrado'
+      } );
+    }
+
+    // Actualizar indicadores del proceso
+    const indicadoresActualizados = await prisma.proceso.update( {
+      where: { id: Number( procesoId ) },
+      data: {
+        indicadores: {
+          connect: indicadores.map( id => ( { id: Number( id ) } ) )
+        }
+      }
+    } );
+
+    res.json( {
+      ok: true,
+      msg: 'Indicadores actualizados',
+      indicadores: indicadoresActualizados
+    } );
+
+  } catch ( error ) {
+    console.error( error );
+    res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al actualizar los indicadores del proceso'
+    } );
+  }
+};
 
 module.exports = {
   listaProcesos,
@@ -743,7 +782,7 @@ module.exports = {
   registrarInputOutput,
   registrarFichaProceso,
   obtenerImagenDiagrama64,
-  registrarDiagramaProceso
-
+  registrarDiagramaProceso,
+  actualizarIndicadores,
 }
 
