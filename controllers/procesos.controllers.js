@@ -572,6 +572,7 @@ const registrarInputOutput = async ( req = request, res = response ) => {
 
 const registrarFichaProceso = async ( req = request, res = response ) => {
 
+  
   const { id } = req.params;
 
   try {
@@ -605,7 +606,7 @@ const registrarFichaProceso = async ( req = request, res = response ) => {
     res.json( {
       ok: true,
       msg: 'Ficha del proceso registrada',
-      ficha: fichaCreada
+      fichaId: fichaCreada.id
     } );
 
   } catch ( error ) {

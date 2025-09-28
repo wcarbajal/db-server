@@ -38,13 +38,18 @@ const getInputOutputById = async ( req = request, res = response ) => {
 
 const byIdRegistrarInputOutput = async ( req = request, res = response ) => {
 
-  const { id } = req.params;
+  const { id } = req.params;  
   const fichaId = Number( id );
+  
+    
   const { inputOutput } = req.body;
 
   try {
 
-    const ficha = await prisma.ficha.findUnique( { where: { id: fichaId } } );
+    const ficha = await prisma.ficha.findUnique( { 
+      where: { id: fichaId }
+     } );
+
     if ( !ficha ) {
       return res.status( 404 ).json( { ok: false, msg: 'Ficha no encontrada' } );
     }
