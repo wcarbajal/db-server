@@ -91,7 +91,8 @@ model Proceso {
   nivel         Int
   descripcion   String?
   objetivo      String?
-  estrategico   String?
+  estrategico   Indicador?  @relation("ProcesoEstrategico", fields: [estrategicoId], references: [id])
+  estrategicoId Int?        @unique
   alcance       String?
   parentId      Int?
   estado        Boolean?    @default(true)
@@ -105,7 +106,7 @@ model Proceso {
   diagrama    Diagrama?
   ficha       Ficha?
   actividades Actividad[]
-  indicadores Indicador[]
+  indicadores Indicador[] @relation("ProcesoIndicadores")
   mapa        Mapa        @relation(fields: [mapaId], references: [id])
   mapaId      Int
 
@@ -168,7 +169,11 @@ model Indicador {
   hijos    Indicador[] @relation("IndicadorParent")
 
   procesoId Int?
-  proceso   Proceso? @relation(fields: [procesoId], references: [id])
+  proceso   Proceso? @relation("ProcesoIndicadores", fields: [procesoId], references: [id])
+  
+  // Relación única para indicador estratégico
+  procesoEstrategico Proceso? @relation("ProcesoEstrategico")
+  
   mapa      Mapa     @relation(fields: [mapaId], references: [id])
   mapaId    Int
 

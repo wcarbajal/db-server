@@ -5,7 +5,7 @@ const path = require( 'path' );
 const prisma = new PrismaClient();
 
 const getIndicadores = async ( req = request, res = response ) => {
-  console.log( "inicio de getIndicadores" );
+  
   const { mapaId } = req.params;
 
   try {
@@ -47,8 +47,8 @@ const getIndicadores = async ( req = request, res = response ) => {
         msg: 'No se encontraron indicadores para este mapa'
       } );
     }
-    console.log( { indicadores } );
-    console.log( { raiz } );
+
+
 
     res.json( {
       ok: true,
@@ -66,7 +66,7 @@ const getIndicadores = async ( req = request, res = response ) => {
 
 const getIndicadoresDisponibles = async ( req = request, res = response ) => {
 
-  console.log( "inicio de getIndicadoresDisponibles" );
+  
 
   const { mapaId } = req.params;
 

@@ -357,7 +357,7 @@ const actualizarDescripcionProceso = async ( req = request, res = response ) => 
         tipo: tipo ?? procesoExistente.tipo,
         nivel: nivel ? +nivel : procesoExistente.nivel,
         objetivo: objetivo ?? procesoExistente.objetivo,
-        estrategico: estrategico ?? procesoExistente.estrategico,
+        estrategicoId: +estrategico ?? procesoExistente.estrategicoId,
         alcance: alcance ?? procesoExistente.alcance,
         owners: {
           set: owners.map( owner => ( { id: Number( owner ) } ) )
