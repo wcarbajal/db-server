@@ -7,13 +7,28 @@ const prisma = new PrismaClient();
 const getIndicadores = async ( req = request, res = response ) => {
   
   const { mapaId } = req.params;
+   // Validar que mapaId existe
+  if ( !mapaId ) {
+    return res.status( 400 ).json( {
+      ok: false,
+      msg: 'El parámetro mapaId es requerido'
+    } );
+  }
+
+  // Validar que mapaId es un número válido
+  const mapaIdNumber = Number( mapaId );
+  if ( isNaN( mapaIdNumber ) ) {
+    return res.status( 400 ).json( {
+      ok: false,
+      msg: 'El parámetro mapaId debe ser un número válido'
+    } );
+  }
 
   try {
 
-
     // Trae todos los indicadores del mapa, incluyendo resultados
     const indicadores = await prisma.indicador.findMany( {
-      where: { mapaId: Number( mapaId ), estado: true },
+      where: { mapaId: mapaIdNumber, estado: true },
       include: { resultado: true }
     } );
 
@@ -66,16 +81,31 @@ const getIndicadores = async ( req = request, res = response ) => {
 
 const getIndicadoresDisponibles = async ( req = request, res = response ) => {
 
-  
-
   const { mapaId } = req.params;
+
+  // Validar que mapaId existe
+  if ( !mapaId ) {
+    return res.status( 400 ).json( {
+      ok: false,
+      msg: 'El parámetro mapaId es requerido'
+    } );
+  }
+
+  // Validar que mapaId es un número válido
+  const mapaIdNumber = Number( mapaId );
+  if ( isNaN( mapaIdNumber ) ) {
+    return res.status( 400 ).json( {
+      ok: false,
+      msg: 'El parámetro mapaId debe ser un número válido'
+    } );
+  }
 
   try {
 
     // Trae solo los indicadores del mapa que no tienen procesoId asignado
     const indicadores = await prisma.indicador.findMany( {
       where: {
-        mapaId: Number( mapaId ),
+        mapaId: mapaIdNumber,
         estado: true,
         procesoId: null // Solo indicadores sin proceso asignado
       },
