@@ -39,8 +39,17 @@ const getInputOutputById = async ( req = request, res = response ) => {
 const byIdRegistrarInputOutput = async ( req = request, res = response ) => {
 
   const { id } = req.params;  
-  const fichaId = Number( id );
   
+  
+  // Validar que el id existe y es un número válido
+  if (!id || isNaN(Number(id))) {
+    return res.status(400).json({ 
+      ok: false, 
+      msg: 'ID de ficha no válido' 
+    });
+  }
+  
+  const fichaId = Number( id );
     
   const { inputOutput } = req.body;
 

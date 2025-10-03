@@ -25,10 +25,12 @@ const listaProcesos = async ( req = request, res = response ) => {
         orderBy: {
           nivel: 'asc'
         },
-        include: {
+        /* include: {
           ficha: true,
-        }
-      }
+          actividades: true,
+        } */
+      },
+      
     }
 
   } );
@@ -238,7 +240,8 @@ const detalleProceso = async ( req = request, res = response ) => {
         hijos: true,
         owners: true,
         responsables: true,
-        parent: true
+        parent: true,
+        
       }
     } );
 
@@ -462,7 +465,8 @@ const registrarActividadesProceso = async ( req = request, res = response ) => {
               descripcion: actividad.descripcion,
               unidadOperativa: actividad.unidadOperativa,
               numOrden: actividad.numOrden,
-              responsable: actividad.responsable
+              responsable: actividad.responsable,
+              registro: actividad.registro,
             }
           } );
         } else {
@@ -672,7 +676,9 @@ const obtenerImagenDiagrama64 = async ( req = request, res = response ) => {
 
 const registrarDiagramaProceso = async ( req = request, res = response ) => {
   const { id } = req.params;
-  const { xml } = req.body;
+  const { xml, imagen } = req.body;
+
+
 
 
 
@@ -701,7 +707,7 @@ const registrarDiagramaProceso = async ( req = request, res = response ) => {
         data: {
           procesoId: Number( id ),
           xml,
-          url: 'no definido',
+          url: imagen || 'no definido',
         }
       } );
     } else {
@@ -709,7 +715,7 @@ const registrarDiagramaProceso = async ( req = request, res = response ) => {
         where: { procesoId: Number( id ) },
         data: {
           xml,
-          url: 'no definido',
+          url: imagen || 'no definido',
         }
       } );
     }
@@ -717,7 +723,8 @@ const registrarDiagramaProceso = async ( req = request, res = response ) => {
     res.json( {
       ok: true,
       msg: 'Diagrama del proceso registrado',
-      diagrama: xmlRegistro.xml
+      diagrama: xmlRegistro.xml,
+      url: xmlRegistro.url
     } );
 
   } catch ( error ) {
