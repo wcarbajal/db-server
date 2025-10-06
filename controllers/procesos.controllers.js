@@ -25,10 +25,13 @@ const listaProcesos = async ( req = request, res = response ) => {
         orderBy: {
           nivel: 'asc'
         },
-        /* include: {
-          ficha: true,
-          actividades: true,
-        } */
+        include: {
+          owners: {
+            include: {
+              unidadOperativa: true
+            }
+          }
+        }
       },
       
     }
@@ -238,9 +241,14 @@ const detalleProceso = async ( req = request, res = response ) => {
         ficha: true,
         indicadores: true,
         hijos: true,
-        owners: true,
+        owners: {
+          include: {
+            unidadOperativa: true
+          }
+        },
         responsables: true,
         parent: true,
+        estrategico: true,       
         
       }
     } );
@@ -365,6 +373,14 @@ const actualizarDescripcionProceso = async ( req = request, res = response ) => 
         owners: {
           set: owners.map( owner => ( { id: Number( owner ) } ) )
         }
+      },
+      include: {
+        owners: {
+          include: {
+            unidadOperativa: true
+          }
+        },
+        estrategico: true
       }
     } );
 
