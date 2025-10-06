@@ -238,7 +238,14 @@ const detalleProceso = async ( req = request, res = response ) => {
       include: {
         actividades: true,
         diagrama: true,
-        ficha: true,
+        ficha: {
+          include: {
+            inputOutput: true,
+            registros: true,
+            proceso: true
+            
+          }
+        },
         indicadores: true,
         hijos: true,
         owners: {
@@ -598,7 +605,8 @@ const registrarFichaProceso = async ( req = request, res = response ) => {
   try {
     // Verificar si el proceso existe
     const procesoExistente = await prisma.proceso.findUnique( {
-      where: { id: Number( id ) }
+      where: { id: Number( id ) }, 
+      include: { ficha: true }
     } );
 
     if ( !procesoExistente ) {
