@@ -242,8 +242,8 @@ const detalleProceso = async ( req = request, res = response ) => {
           include: {
             inputOutput: true,
             registros: true,
-            proceso: true
-            
+            proceso: true, 
+            riesgos: true,            
           }
         },
         indicadores: true,
