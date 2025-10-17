@@ -208,7 +208,7 @@ const crearIndicador = async ( req = request, res = response ) => {
 const modificarIndicador = async ( req = request, res = response ) => {
   const { id } = req.params;
   const camposPermitidos = [
-    "codigo", "nombre", "nivelIndicador", "tipoIndicador", "parentId",
+    "codigo", "nombre", "descripcion", "nivelIndicador", "tipoIndicador", "parentId",
     "formula", "frecuencia", "fuenteDatos", "justificacion", "lineaBase",
     "logrosEsperados", "sentidoEsperado", "unidadMedida"
   ];
