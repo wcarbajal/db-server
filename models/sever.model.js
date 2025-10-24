@@ -23,6 +23,7 @@ class Server {
     this.usuarioPath = '/api/usuario';
     this.rolPath = '/api/rol';
     this.indicadorPath = '/api/indicador';
+    this.resultadoPath = '/api/resultado';
 
 
     // Http server
@@ -51,6 +52,7 @@ class Server {
     this.app.use( this.usuarioPath, validarJWT, require( '../routes/usuario.routes.js' ) );
     this.app.use( this.rolPath, validarJWT, require( '../routes/rol.routes.js' ) );
     this.app.use( this.indicadorPath, validarJWT, require( '../routes/indicador.routes.js' ) );
+    this.app.use( this.resultadoPath, validarJWT, require( '../routes/resultados.routes.js' ) );
 
 
   } 
