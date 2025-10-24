@@ -8,7 +8,8 @@ const {
   getIndicador,
   eliminarIndicador,
   deleteIndicadorProceso,
-  getIndicadoresDisponibles
+  getIndicadoresDisponibles,
+  getResultados
 
 } = require( '../controllers/indicador.controllers' );
 
@@ -22,6 +23,10 @@ const route = Router();
 route.get( '/:mapaId', [
   validarCampos
 ], getIndicadores );
+
+route.get( '/resultados/:indicadorId', [
+  validarCampos
+], getResultados );
 
 route.get( '/:mapaId/disponibles', [
   validarCampos

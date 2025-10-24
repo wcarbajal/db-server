@@ -79,6 +79,54 @@ const getIndicadores = async ( req = request, res = response ) => {
   }
 };
 
+const getResultados = async ( req = request, res = response ) => {
+  
+  const { indicadorId } = req.params;
+   // Validar que indicadorId existe
+  if ( !indicadorId ) {
+    return res.status( 400 ).json( {
+      ok: false,
+      msg: 'El parámetro indicadorId es requerido'
+    } );
+  }
+
+  // Validar que indicadorId es un número válido
+  const indicadorIdNumber = Number( indicadorId );
+  if ( isNaN( indicadorIdNumber ) ) {
+    return res.status( 400 ).json( {
+      ok: false,
+      msg: 'El parámetro indicadorId debe ser un número válido'
+    } );
+  }
+
+  try {
+
+    // Trae todos los indicadores del mapa, incluyendo resultados
+    const resultados = await prisma.resultado.findMany( {
+      where: { indicadorId: indicadorIdNumber },      
+      include: { indicador: true }
+    } );
+
+    if ( resultados.length === 0 ) {
+      return res.status( 404 ).json( {
+        ok: false,
+        msg: 'No se encontraron resultados para este indicador'
+      } );
+    }
+    res.json( {
+      ok: true,
+      resultados,      
+    } );
+  } catch ( error ) {
+    console.log( error );
+    res.status( 500 ).json( {
+      ok: false,
+      msg: 'Error al obtener los resiultados'
+    } );
+  }
+};
+
+
 const getIndicadoresDisponibles = async ( req = request, res = response ) => {
 
   const { mapaId } = req.params;
@@ -350,5 +398,6 @@ module.exports = {
   getIndicador,
   eliminarIndicador,
   deleteIndicadorProceso,
-  getIndicadoresDisponibles
+  getIndicadoresDisponibles,
+  getResultados
 };
