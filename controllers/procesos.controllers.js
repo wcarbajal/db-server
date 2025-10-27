@@ -30,7 +30,13 @@ const listaProcesos = async ( req = request, res = response ) => {
             include: {
               unidadOperativa: true
             }
-          }
+          },
+          indicadores: {
+            include:{
+              resultados:true
+            }
+          },
+          
         }
       },
       

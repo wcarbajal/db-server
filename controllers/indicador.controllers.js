@@ -31,6 +31,7 @@ const getIndicadores = async ( req = request, res = response ) => {
       where: { mapaId: mapaIdNumber, estado: true },
       include: { resultado: true }
     } );
+    console.log("indicadores", indicadores)
 
     if ( indicadores.length === 0 ) {
       return res.status( 404 ).json( {
@@ -92,6 +93,7 @@ const getResultados = async ( req = request, res = response ) => {
 
   // Validar que indicadorId es un número válido
   const indicadorIdNumber = Number( indicadorId );
+
   if ( isNaN( indicadorIdNumber ) ) {
     return res.status( 400 ).json( {
       ok: false,
@@ -109,12 +111,14 @@ const getResultados = async ( req = request, res = response ) => {
 
     if ( resultados.length === 0 ) {
       return res.status( 404 ).json( {
-        ok: false,
-        msg: 'No se encontraron resultados para este indicador'
+        ok: true,
+        msg: 'No se encontraron resultados para este indicador', 
+        resultados: []
       } );
     }
     res.json( {
       ok: true,
+      msg: 'Resultados obtenidos con éxito',
       resultados,      
     } );
   } catch ( error ) {
