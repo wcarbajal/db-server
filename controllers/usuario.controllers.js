@@ -32,8 +32,6 @@ const getUsuarios = async ( req = request, res = response ) => {
       }
     } );
 
-console.log({usuarios})
-
     // verificar que hayan usuarios
     if ( !usuarios || usuarios.length === 0 ) {
       return res.status( 404 ).json( {

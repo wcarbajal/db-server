@@ -188,8 +188,6 @@ const getIndicadoresDisponibles = async ( req = request, res = response ) => {
       }
     } );
 
-    console.log( { indicadores } );
-    console.log( { raiz } );
 
     res.json( {
       ok: true,
